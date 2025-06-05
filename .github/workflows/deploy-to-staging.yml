@@ -1,0 +1,93 @@
+name: Deploy to Staging
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+env:
+  APP_ENV: staging
+  DOCKER_BUILDKIT: 1
+  GITHUB_SHA: ${{ github.sha }}
+  SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+  SENTRY_ORG: lemonadesocial
+  SENTRY_PROJECT: lemonade-identity
+  SENTRY_RELEASE: ${{ github.sha }}
+
+jobs:
+  buildAndPush:
+    if: |
+      github.event_name != 'push'
+        || !startsWith(github.event.head_commit.message, 'chore(master): release')
+    name: Build and push
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Set up buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ secrets.STAGING_REGION }}
+          role-to-assume: ${{ secrets.STAGING_ROLE_TO_ASSUME }}
+
+      - name: Generate .env file from GitHub variables
+        run: |
+          echo "NEXT_PUBLIC_ORY_SDK_URL=${{ vars.STAGING_NEXT_PUBLIC_ORY_SDK_URL }}" >> .env
+          echo "ORY_SDK_URL=${{ secrets.STAGING_ORY_SDK_URL }}" >> .env
+
+      - name: Configure environment
+        run: |
+          aws ssm get-parameter --name ${{ secrets.STAGING_PARAMETER_NAME }} | jq '.Parameter.Value' | jq '. | fromjson' | jq -r 'to_entries | .[] | .key + "=" + .value' >> $GITHUB_ENV || exit 1
+
+      - name: Amazon ECR login
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Bake
+        uses: docker/bake-action@v2
+        with:
+          targets: builder,upload,app
+          set: |
+            builder.cache-from=type=registry,ref=${{ env.REPOSITORY_URI }}:release-builder
+            builder.cache-to=type=inline
+            builder.tags=${{ env.REPOSITORY_URI }}:release-builder
+            builder.output=type=registry
+            app.tags=${{ env.REPOSITORY_URI }}:${{ env.GITHUB_SHA }}
+            app.tags=${{ env.REPOSITORY_URI }}:release
+            app.output=type=registry
+
+  deploy:
+    needs: buildAndPush
+    name: Deploy
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ secrets.STAGING_REGION }}
+          role-to-assume: ${{ secrets.STAGING_ROLE_TO_ASSUME }}
+
+      - name: Configure environment
+        run: |
+          aws ssm get-parameter --name ${{ secrets.STAGING_PARAMETER_NAME }} | jq '.Parameter.Value' | jq '. | fromjson' | jq -r 'to_entries | .[] | .key + "=" + .value' >> $GITHUB_ENV || exit 1
+
+      - name: Configure kube
+        run: |
+          eval $KUBECONFIG_COMMAND
+
+      - name: Deploy
+        run: |
+          kubectl set image --namespace $NAMESPACE deployment/identity identity=$REPOSITORY_URI:$GITHUB_SHA
+
+      - name: Verify
+        run: |
+          kubectl rollout status --namespace $NAMESPACE deployment/identity
