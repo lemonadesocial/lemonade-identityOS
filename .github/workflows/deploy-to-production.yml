@@ -36,7 +36,7 @@ jobs:
       - name: Generate .env file from GitHub variables
         run: |
           echo "NEXT_PUBLIC_ORY_SDK_URL=${{ vars.PRODUCTION_NEXT_PUBLIC_ORY_SDK_URL }}" >> .env
-          echo "ORY_SDK_URL=${{ secrets.PRODUCTION_ORY_SDK_URL }}" >> .env
+          echo "NEXT_PUBLIC_COOKIE_DOMAIN=${{ vars.PRODUCTION_NEXT_PUBLIC_COOKIE_DOMAIN }}" >> .env
 
       - name: Configure environment
         run: |
