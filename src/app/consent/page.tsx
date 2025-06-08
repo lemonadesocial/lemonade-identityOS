@@ -1,18 +1,38 @@
-import { getLoginFlow, getServerSession, OryPageParams } from "@ory/nextjs/app";
+import { getServerSession, OryPageParams } from "@ory/nextjs/app";
+import { redirect } from "next/navigation";
 
-import config from "../../../ory.config";
-
-import ConsentUI from "./ui";
+import { oauthApi } from "../../common/ory";
 
 export default async function ConsentPage(props: OryPageParams) {
-  const [flow, session] = await Promise.all([
-    getLoginFlow(config, props.searchParams),
-    getServerSession(),
-  ]);
+  const [seachParams, session] = await Promise.all([props.searchParams, getServerSession()]);
 
-  if (!session || !flow) {
+  const consentChallenge = seachParams.consent_challenge?.toString();
+
+  if (!session || !consentChallenge) {
     return null;
   }
 
-  return <ConsentUI config={config} flow={flow} session={session} />;
+  const consentRequest = await oauthApi.getOAuth2ConsentRequest({ consentChallenge });
+
+  const user = (session.identity?.metadata_public as Record<string, string>).user;
+
+  const acceptResponse = await oauthApi.acceptOAuth2ConsentRequest({
+    consentChallenge,
+    acceptOAuth2ConsentRequest: {
+      grant_scope: consentRequest.requested_scope,
+      grant_access_token_audience: consentRequest.requested_access_token_audience,
+      session: {
+        access_token: {
+          session: session.id,
+          user,
+        },
+        id_token: {
+          session: session.id,
+          user,
+        },
+      },
+    },
+  });
+
+  return redirect(acceptResponse.redirect_to);
 }
