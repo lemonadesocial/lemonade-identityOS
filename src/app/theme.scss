@@ -8,6 +8,8 @@
 
   /* variables */
   --text-primary: var(--black);
+  --background-primary: var(--white);
+  --background-secondary: var(--white-alt);
   --border-primary: var(--white-alt);
 
   /* root styles */
@@ -16,19 +18,31 @@
   /* 
     override ory theme, see: https://github.com/ory/elements/tree/main/packages/elements-react#theming
   */
-  --input-background-default: var(--black);
+  --input-background-default: var(--background-primary);
+  --input-background-hover: var(--background-secondary);
   --border-radius-buttons: 1rem;
   --border-radius-forms: 1rem;
-  --button-social-foreground-default: var(--black);
+
+  --button-social-foreground-default: var(--text-primary);
+  --button-social-background-default: var(--background-primary);
+  --button-social-background-hover: var(--background-secondary);
+
+  --button-secondary-foreground-hover: var(--text-primary);
+  --button-secondary-background-hover: var(--background-secondary);
+
   --interface-foreground-default-primary: var(--text-primary);
   --interface-foreground-brand-primary: var(--accent);
   --interface-border-default-primary: var(--border-primary);
+  --interface-background-default-primary: var(--background-primary);
+  --interface-background-default-secondary: var(--background-secondary);
 }
 
 /* Dark mode theme */
 @media (prefers-color-scheme: dark) {
   :root {
     --text-primary: var(--white);
+    --background-primary: var(--black);
+    --background-secondary: var(--black-alt);
     --border-primary: var(--black-alt);
   }
 }
