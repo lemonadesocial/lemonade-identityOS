@@ -5,14 +5,21 @@ import { Login } from "@ory/elements-react/theme";
 
 import { type PageProps } from "../../common/types";
 import { overridedComponents } from "../../common/ui";
+import CardWrapper from "../../components/CardWrapper";
+import Page from "../../components/page";
 
 interface Props extends PageProps {
   flow: LoginFlow;
 }
 export default function LoginUI({ flow, config }: Props) {
   return (
-    <div>
-      <Login flow={flow} config={config} components={overridedComponents} />
-    </div>
+    <Page>
+      <CardWrapper>
+        <div className="page-title" style={{ alignSelf: "flex-start" }}>
+          {"Sign in"}
+        </div>
+        <Login flow={flow} config={config} components={overridedComponents} />
+      </CardWrapper>
+    </Page>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
-import { ReactNode } from "react";
+import { PropsWithChildren } from "react";
 
-export default function CardRoot({ children }: { children?: ReactNode }) {
-  return <div style={{ backgroundColor: "white" }}>{children}</div>;
+export default function CardRoot({ children }: PropsWithChildren) {
+  return <div className="card-root">{children}</div>;
 }
