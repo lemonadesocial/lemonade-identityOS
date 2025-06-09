@@ -1,6 +1,18 @@
+@import "@ory/elements-react/theme/styles.css";
+@import "./theme.scss";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+  display: flex;
+}
 
 body {
   color: var(--foreground);
