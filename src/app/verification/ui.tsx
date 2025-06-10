@@ -1,6 +1,6 @@
 "use client";
 
-import { UiNodeInputAttributes, VerificationFlow } from "@ory/client-fetch";
+import { VerificationFlow } from "@ory/client-fetch";
 import { Verification } from "@ory/elements-react/theme";
 
 import { type PageProps } from "../../common/types";
