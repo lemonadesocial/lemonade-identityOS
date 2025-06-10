@@ -1,7 +1,8 @@
-import {} from "@ory/client-fetch";
 import { OryPageParams } from "@ory/nextjs/app";
 
 import { getErrorFromId } from "../../common/error";
+import CardWrapper from "../../components/CardWrapper";
+import Page from "../../components/page";
 
 export default async function ErrorPage(props: OryPageParams) {
   const searchParams = await props.searchParams;
@@ -9,10 +10,17 @@ export default async function ErrorPage(props: OryPageParams) {
   const id = searchParams?.id;
 
   if (!id || typeof id !== "string") {
-    return <div>No error id</div>;
+    return null;
   }
 
-  const error = await getErrorFromId(id);
+  const { error } = await getErrorFromId(id);
 
-  return <div>{JSON.stringify(error)}</div>;
+  return (
+    <Page>
+      <CardWrapper>
+        <div style={{ textTransform: "uppercase" }}>{`ERROR: ${error.message}`}</div>
+        <div style={{ textAlign: "center" }}>{error.reason}</div>
+      </CardWrapper>
+    </Page>
+  );
 }

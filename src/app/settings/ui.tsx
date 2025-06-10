@@ -13,11 +13,7 @@ interface Props extends PageProps {
 export default function SettingsUI({ flow, config }: Props) {
   return (
     <Page>
-      <Settings
-        flow={flow}
-        config={{ ...config, project: { ...config.project, name: "" } }}
-        components={overridedComponents}
-      />
+      <Settings flow={flow} config={config} components={overridedComponents} />
     </Page>
   );
 }

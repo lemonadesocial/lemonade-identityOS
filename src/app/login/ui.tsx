@@ -15,9 +15,6 @@ export default function LoginUI({ flow, config }: Props) {
   return (
     <Page>
       <CardWrapper>
-        <div className="page-title" style={{ alignSelf: "flex-start" }}>
-          {"Sign in"}
-        </div>
         <Login flow={flow} config={config} components={overridedComponents} />
       </CardWrapper>
     </Page>
