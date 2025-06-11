@@ -9,6 +9,7 @@ import { overridedComponents } from "../../common/ui";
 import CardWrapper from "../../components/card-wrapper";
 import FamilyWallet from "../../components/family-wallet";
 import Page from "../../components/page";
+import { Web3Provider } from "../../components/family-wallet/web3-provider";
 
 function OidcButton(props: OryNodeOidcButtonProps) {
   const { value } = props.attributes;
@@ -42,19 +43,21 @@ export default function LoginUI({ flow, config }: Props) {
   };
 
   return (
-    <Page>
-      <CardWrapper>
-        <Login
-          flow={updatedFlow}
-          config={config}
-          components={{
-            ...overridedComponents,
-            Node: {
-              OidcButton,
-            },
-          }}
-        />
-      </CardWrapper>
-    </Page>
+    <Web3Provider>
+      <Page>
+        <CardWrapper>
+          <Login
+            flow={updatedFlow}
+            config={config}
+            components={{
+              ...overridedComponents,
+              Node: {
+                OidcButton,
+              },
+            }}
+          />
+        </CardWrapper>
+      </Page>
+    </Web3Provider>
   );
 }
