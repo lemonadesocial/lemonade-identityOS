@@ -15,7 +15,13 @@ function OidcButton(props: OryNodeOidcButtonProps) {
   const { value } = props.attributes;
 
   if (value === "family_wallet") {
-    return <FamilyWallet />;
+    return (
+      <FamilyWallet
+        onLogin={(args) => {
+          console.log("signature, wallet", args);
+        }}
+      />
+    );
   }
 
   return <DefaultButtonSocial {...props} />;
