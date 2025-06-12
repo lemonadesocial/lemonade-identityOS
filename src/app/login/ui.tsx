@@ -70,6 +70,7 @@ export default function LoginUI({ flow, config }: Props) {
             components={{
               ...overridedComponents,
               Node: {
+                ...overridedComponents?.Node,
                 OidcButton,
               },
             }}

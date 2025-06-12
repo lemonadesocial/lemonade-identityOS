@@ -4,6 +4,8 @@ import { ConnectKitButton } from "connectkit";
 import { useEffect, useState } from "react";
 import { useAccount, useSignMessage, useDisconnect } from "wagmi";
 
+import { getUserWalletRequest } from "../../common/api";
+
 import Icon from "./icon.svg";
 import Spinner from "./spinner.svg";
 
@@ -12,7 +14,7 @@ const buttonClassName =
   "gap-3 border border-button-social-border-default bg-button-social-background-default hover:bg-button-social-background-hover transition-colors rounded-buttons flex items-center justify-center px-4 py-[13px] loading:bg-button-social-background-disabled loading:border-button-social-border-disabled loading:text-button-social-foreground-disabled hover:text-button-social-foreground-hover";
 
 interface Props {
-  onLogin: (args: { signature: string; address: string; message: string }) => void;
+  onLogin: (args: { signature: string; address: string; token: string }) => void;
 }
 export default function FamilyWallet({ onLogin }: Props) {
   const account = useAccount();
@@ -21,14 +23,20 @@ export default function FamilyWallet({ onLogin }: Props) {
 
   const [signing, setSigning] = useState(false);
   const [signature, setSignature] = useState("");
-  const [message, setMessage] = useState("");
+  const [token, setToken] = useState("");
 
   const sign = async () => {
+    if (!account.address) {
+      return;
+    }
+
     setSignature("");
 
     //-- request payload from backend
-    const message = "Hello, world!";
-    setMessage(message);
+    const data = await getUserWalletRequest(account.address);
+
+    const message = data.message;
+    setToken(data.token);
 
     signMessage(
       { message },
@@ -49,10 +57,10 @@ export default function FamilyWallet({ onLogin }: Props) {
   };
 
   useEffect(() => {
-    if (signature && account.address && message) {
-      onLogin({ signature, message, address: account.address });
+    if (signature && account.address && token) {
+      onLogin({ signature, address: account.address, token });
     }
-  }, [signature, account.address, message]);
+  }, [signature, account.address, token]);
 
   useEffect(() => {
     if (account.isDisconnected) {

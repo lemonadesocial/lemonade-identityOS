@@ -6,6 +6,11 @@ export const oauthApi = new OAuth2Api(
   }),
 );
 
-export const frontendApi = new FrontendApi(new Configuration({
-  basePath: process.env.NEXT_PUBLIC_ORY_SDK_URL,
-}));
+export const frontendApi = new FrontendApi(
+  new Configuration({
+    headers: {
+      Accept: "application/json",
+    },
+    basePath: process.env.NEXT_PUBLIC_ORY_SDK_URL,
+  }),
+);
