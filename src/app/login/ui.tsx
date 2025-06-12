@@ -1,24 +1,36 @@
 "use client";
 
-import { OryNodeOidcButtonProps } from "@ory/elements-react";
 import { LoginFlow, UiNode, UiNodeInputAttributes } from "@ory/client-fetch";
+import { OryNodeOidcButtonProps } from "@ory/elements-react";
 import { DefaultButtonSocial, Login } from "@ory/elements-react/theme";
+import { useSearchParams } from "next/navigation";
 
 import { type PageProps } from "../../common/types";
 import { overridedComponents } from "../../common/ui";
 import CardWrapper from "../../components/card-wrapper";
 import FamilyWallet from "../../components/family-wallet";
-import Page from "../../components/page";
 import { Web3Provider } from "../../components/family-wallet/web3-provider";
+import Page from "../../components/page";
 
 function OidcButton(props: OryNodeOidcButtonProps) {
+  const searchParams = useSearchParams();
+
   const { value } = props.attributes;
 
   if (value === "family_wallet") {
     return (
       <FamilyWallet
         onLogin={(args) => {
-          console.log("signature, wallet", args);
+          //-- push these params to the wallet page and redirect there
+          const params = new URLSearchParams(searchParams);
+
+          params.set("type", "login");
+          params.set("wallet", args.address);
+          params.set("signature", args.signature);
+          params.set("message", args.message);
+          params.set("token", "");
+
+          window.location.href = `/wallet?${params.toString()}`;
         }}
       />
     );
