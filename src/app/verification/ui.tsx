@@ -4,7 +4,7 @@ import { VerificationFlow } from "@ory/client-fetch";
 import { Verification } from "@ory/elements-react/theme";
 
 import { type PageProps } from "../../common/types";
-import { overridedComponents } from "../../common/ui";
+import { overridedComponents } from "../../client/ui";
 import CardWrapper from "../../components/card-wrapper";
 import Page from "../../components/page";
 

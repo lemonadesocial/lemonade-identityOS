@@ -1,4 +1,12 @@
-import { Configuration, OAuth2Api, FrontendApi } from "@ory/client-fetch";
+import {
+  Configuration,
+  FrontendApi,
+  LoginFlow,
+  OAuth2Api,
+  RegistrationFlow,
+  UiNode,
+  UiNodeInputAttributes,
+} from "@ory/client-fetch";
 
 export const oauthApi = new OAuth2Api(
   new Configuration({
@@ -14,3 +22,22 @@ export const frontendApi = new FrontendApi(
     basePath: process.env.NEXT_PUBLIC_ORY_SDK_URL,
   }),
 );
+
+function nodeSortValue(node: UiNode) {
+  const attributes = node.attributes as UiNodeInputAttributes;
+  return attributes.value === "family_wallet" ? "" : attributes.value.toString() || "";
+}
+
+export function getFlowWithOidcNodesSorted<T extends LoginFlow | RegistrationFlow>(flow: T) {
+  const oidcNodes = flow.ui.nodes
+    .filter((node) => node.group === "oidc")
+    .sort((node1, node2) => nodeSortValue(node2).localeCompare(nodeSortValue(node1)));
+
+  return {
+    ...flow,
+    ui: {
+      ...flow.ui,
+      nodes: flow.ui.nodes.filter((node) => node.group !== "oidc").concat(oidcNodes),
+    },
+  } as T;
+}

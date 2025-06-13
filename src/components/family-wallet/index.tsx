@@ -4,7 +4,7 @@ import { ConnectKitButton } from "connectkit";
 import { useEffect, useState } from "react";
 import { useAccount, useSignMessage, useDisconnect } from "wagmi";
 
-import { getUserWalletRequest } from "../../common/api";
+import { getUserWalletRequest } from "../../client/api";
 
 import Icon from "./icon.svg";
 import Spinner from "./spinner.svg";
