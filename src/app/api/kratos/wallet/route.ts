@@ -4,8 +4,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifySignerFromSignatureAndToken } from "../../../../common/wallet";
 
 export async function POST(request: NextRequest) {
-  assert.ok(process.env.JWT_SECRET);
-
   const body = await request.json();
 
   const { wallet_signature: signature, wallet_signature_token: token, ...keptTraits } = body.identity.traits;

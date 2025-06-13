@@ -3,14 +3,17 @@ import Redis from "ioredis";
 
 const RETRY_DELAY = 1000;
 
-function createRedis() {
-  assert.ok(process.env.REDIS_URL);
+let redis: Redis;
 
-  const redis = new Redis(process.env.REDIS_URL, {
-    retryStrategy: () => RETRY_DELAY,
-  });
+export function getRedis() {
+  if (!redis) {
+    const redisUrl = process.env.REDIS_URL;
+    assert.ok(redisUrl, "REDIS_URL is missing");
+
+    redis = new Redis(redisUrl, {
+      retryStrategy: () => RETRY_DELAY,
+    });
+  }
 
   return redis;
 }
-
-export const redis = createRedis();

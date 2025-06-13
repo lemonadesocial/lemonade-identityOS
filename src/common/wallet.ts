@@ -3,17 +3,19 @@ import * as ethers from "ethers";
 
 import { verify } from "../utils/jwt";
 
-import { redis } from "../helpers/redis";
+import { getRedis } from "../helpers/redis";
 
 export const verifySignerFromSignatureAndToken = async (signature: string, token: string) => {
-  assert.ok(process.env.JWT_SECRET);
+  const jwtSecret = process.env.JWT_SECRET;
+
+  assert.ok(jwtSecret, "JWT_SECRET is missing");
 
   const { wallet, nonce, message, exp } = await verify<{
     wallet: string;
     nonce: string;
     message: string;
     exp: number;
-  }>(token, process.env.JWT_SECRET);
+  }>(token, jwtSecret);
 
   const signer = ethers.verifyMessage(message, signature).toLowerCase();
 
@@ -21,7 +23,7 @@ export const verifySignerFromSignatureAndToken = async (signature: string, token
 
   assert.strictEqual(signer, wallet.toLowerCase(), "invalid signature");
 
-  const replayed = await redis.set(`signature:${nonce}`, 1, "EXAT", exp, "GET");
+  const replayed = await getRedis().set(`signature:${nonce}`, 1, "EXAT", exp, "GET");
   assert.strictEqual(replayed, null, "signature replayed");
 
   return signer;

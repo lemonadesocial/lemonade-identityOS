@@ -27,8 +27,7 @@ function OidcButton(props: OryNodeOidcButtonProps) {
           params.set("type", "login");
           params.set("wallet", args.address);
           params.set("signature", args.signature);
-          params.set("message", args.message);
-          params.set("token", "");
+          params.set("token", args.token);
 
           window.location.href = `/wallet?${params.toString()}`;
         }}

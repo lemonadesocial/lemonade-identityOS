@@ -5,7 +5,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { sign } from "../../../utils/jwt";
 
 export async function GET(request: NextRequest) {
-  assert.ok(process.env.JWT_SECRET);
+  const jwtSecret = process.env.JWT_SECRET;
+  assert.ok(jwtSecret, "JWT_SECRET is missing");
 
   const { searchParams } = new URL(request.url);
   const wallet = searchParams.get("wallet");
@@ -19,6 +20,6 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.json({
     message,
-    token: await sign({ wallet, nonce, message }, process.env.JWT_SECRET, { expiresIn: 3600 }),
+    token: await sign({ wallet, nonce, message }, jwtSecret, { expiresIn: 3600 }),
   });
 }
