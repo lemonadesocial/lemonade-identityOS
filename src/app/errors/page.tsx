@@ -1,7 +1,7 @@
 import { OryPageParams } from "@ory/nextjs/app";
 
 import { getErrorFromId } from "../../common/error";
-import CardWrapper from "../../components/CardWrapper";
+import CardWrapper from "../../components/card-wrapper";
 import Page from "../../components/page";
 
 export default async function ErrorPage(props: OryPageParams) {

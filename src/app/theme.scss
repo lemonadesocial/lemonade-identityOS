@@ -89,3 +89,17 @@
     background-color: var(--black);
   }
 }
+
+.card-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 21px;
+  padding: 35px;
+  max-width: 400px;
+  margin: auto;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  background-color: #000000;
+  border-radius: 21px;
+}

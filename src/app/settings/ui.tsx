@@ -4,7 +4,7 @@ import { SettingsFlow } from "@ory/client-fetch";
 import { Settings } from "@ory/elements-react/theme";
 
 import { type PageProps } from "../../common/types";
-import { overridedComponents } from "../../common/ui";
+import { overridedComponents } from "../../client/ui";
 import Page from "../../components/page";
 
 interface Props extends PageProps {
