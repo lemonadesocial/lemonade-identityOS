@@ -1,6 +1,7 @@
 import {
   LoginFlow,
   RegistrationFlow,
+  SettingsFlow,
   SuccessfulNativeLogin,
   SuccessfulNativeRegistration,
   UiNodeInputAttributes,
@@ -8,9 +9,11 @@ import {
 
 import { frontendApi } from "../common/ory";
 
-export function getCsrfToken(flow: LoginFlow | RegistrationFlow): string | undefined {
+export function getCsrfToken(
+  flow: LoginFlow | RegistrationFlow | SettingsFlow,
+): string | undefined {
   const csrfNode = flow.ui.nodes.find(
-    (node) => (node.attributes as UiNodeInputAttributes).name === "csrf_token",
+    (node) => "name" in node.attributes && node.attributes.name === "csrf_token",
   )?.attributes;
 
   return (csrfNode as UiNodeInputAttributes)?.value;

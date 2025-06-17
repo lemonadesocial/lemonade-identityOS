@@ -36,6 +36,8 @@
   --interface-background-default-primary: var(--background-primary);
   --interface-background-default-secondary: var(--background-secondary);
   --interface-background-default-primary-hover: var(--background-secondary);
+  --input-background-disabled: var(--background-secondary);
+  --input-border-disabled: transparent;
 }
 
 /* Dark mode theme */
@@ -102,4 +104,8 @@
   align-items: center;
   background-color: #000000;
   border-radius: 21px;
+}
+
+.bg-button-social-background-generic-provider {
+  min-width: 32px;
 }
