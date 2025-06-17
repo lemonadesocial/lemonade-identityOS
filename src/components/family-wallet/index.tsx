@@ -6,7 +6,6 @@ import { useAccount, useSignMessage, useDisconnect } from "wagmi";
 
 import { getUserWalletRequest } from "../../client/api";
 
-import Icon from "./icon.svg";
 import Spinner from "./spinner.svg";
 
 //-- this style is copied from ory default social button theme
@@ -14,7 +13,10 @@ const buttonClassName =
   "gap-3 border border-button-social-border-default bg-button-social-background-default hover:bg-button-social-background-hover transition-colors rounded-buttons flex items-center justify-center px-4 py-[13px] loading:bg-button-social-background-disabled loading:border-button-social-border-disabled loading:text-button-social-foreground-disabled hover:text-button-social-foreground-hover";
 
 interface Props {
-  onLogin: (args: { signature: string; address: string; token: string }) => void;
+  onLogin: (
+    args: { signature: string; address: string; token: string },
+    disconnect: () => void,
+  ) => void;
 }
 export default function FamilyWallet({ onLogin }: Props) {
   const account = useAccount();
@@ -58,7 +60,7 @@ export default function FamilyWallet({ onLogin }: Props) {
 
   useEffect(() => {
     if (signature && account.address && token) {
-      onLogin({ signature, address: account.address, token });
+      onLogin({ signature, address: account.address, token }, disconnect);
     }
   }, [signature, account.address, token]);
 
@@ -92,7 +94,7 @@ export default function FamilyWallet({ onLogin }: Props) {
             {signing || isConnecting || signature ? (
               <Spinner color={"#ffffff"} alt="loading" />
             ) : (
-              <Icon height={16} color={"#ffffff"} alt="family-wallet" />
+              "Wallet"
             )}
           </button>
         );

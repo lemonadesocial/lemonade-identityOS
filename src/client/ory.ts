@@ -41,32 +41,35 @@ export async function handleWalletRegistration(
   address: string,
   token: string,
 ) {
+  const flow = await frontendApi.getRegistrationFlow(
+    {
+      id: flowId,
+    },
+    { credentials: "include" },
+  );
+
+  if (!flow) {
+    return;
+  }
+
   return frontendApi
-    .getRegistrationFlow(
+    .updateRegistrationFlow(
       {
-        id: flowId,
-      },
-      { credentials: "include" },
-    )
-    .then((flow) =>
-      frontendApi.updateRegistrationFlow(
-        {
-          flow: flow.id,
-          updateRegistrationFlowBody: {
-            method: "password",
-            csrf_token: getCsrfToken(flow),
-            password: getPassword(address),
-            traits: {
-              wallet: address,
-            },
-            transient_payload: {
-              wallet_signature: signature,
-              wallet_signature_token: token,
-            },
+        flow: flow.id,
+        updateRegistrationFlowBody: {
+          method: "password",
+          csrf_token: getCsrfToken(flow),
+          password: getPassword(address),
+          traits: {
+            wallet: address,
+          },
+          transient_payload: {
+            wallet_signature: signature,
+            wallet_signature_token: token,
           },
         },
-        { credentials: "include" },
-      ),
+      },
+      { credentials: "include" },
     )
     .then((registration) => {
       handleFlowSuccess(registration);
@@ -77,35 +80,42 @@ export async function handleWalletRegistration(
 }
 
 export async function handleWalletLogin(
-  flowId: string,
-  signature: string,
-  address: string,
-  token: string,
+  {
+    flow,
+    signature,
+    address,
+    token,
+  }: {
+    flow: LoginFlow;
+    signature: string;
+    address: string;
+    token: string;
+  },
+  onError?: (flow: LoginFlow, err: unknown) => void,
 ) {
   return frontendApi
-    .getLoginFlow({ id: flowId }, { credentials: "include" })
-    .then((flow) =>
-      frontendApi.updateLoginFlow(
-        {
-          flow: flow.id,
-          updateLoginFlowBody: {
-            method: "password",
-            csrf_token: getCsrfToken(flow),
-            password: getPassword(address),
-            identifier: address,
-            transient_payload: {
-              wallet_signature: signature,
-              wallet_signature_token: token,
-            },
+    .updateLoginFlow(
+      {
+        flow: flow.id,
+        updateLoginFlowBody: {
+          method: "password",
+          csrf_token: getCsrfToken(flow),
+          password: getPassword(address),
+          identifier: address,
+          transient_payload: {
+            wallet_signature: signature,
+            wallet_signature_token: token,
           },
         },
-        { credentials: "include" },
-      ),
+      },
+      { credentials: "include" },
     )
     .then((login) => {
       handleFlowSuccess(login);
     })
-    .catch((error) => {
-      handleFlowError(error);
+    .catch((err) => {
+      frontendApi
+        .getLoginFlow({ id: flow.id }, { credentials: "include" })
+        .then((flow) => onError?.(flow, err));
     });
 }
