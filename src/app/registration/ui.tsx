@@ -1,36 +1,36 @@
 "use client";
 
-import { RegistrationFlow } from "@ory/client-fetch";
-import { OryNodeOidcButtonProps } from "@ory/elements-react";
+import { FlowType, RegistrationFlow } from "@ory/client-fetch";
+import { OryNodeOidcButtonProps, useOryFlow } from "@ory/elements-react";
 import { DefaultButtonSocial, Registration } from "@ory/elements-react/theme";
-import { useSearchParams } from "next/navigation";
 
 import { handleWalletRegistration } from "../../client/ory";
-
-import { PageProps } from "../../common/types";
 import { overridedComponents } from "../../client/ui";
-import { getFlowWithOidcNodesSorted } from "../../common/ory";
+
+import { getFlowWithOidcNodesSorted, getFlowWithSomeInputsHidden } from "../../common/ory";
+import { PageProps } from "../../common/types";
 import CardWrapper from "../../components/card-wrapper";
 import FamilyWallet from "../../components/family-wallet";
 import { Web3Provider } from "../../components/family-wallet/web3-provider";
 import Page from "../../components/page";
 
 function OidcButton(props: OryNodeOidcButtonProps) {
-  const searchParams = useSearchParams();
+  const { flow, setFlowContainer } = useOryFlow();
 
   const { value } = props.attributes;
 
   if (value === "family_wallet") {
     return (
       <FamilyWallet
-        onLogin={(args) => {
-          const flowId = searchParams.get("flow")?.toString();
+        onLogin={(args, disconnect) => {
+          handleWalletRegistration({ ...args, flow: flow as RegistrationFlow }, (newFlow) => {
+            setFlowContainer({
+              flow: getFlowWithOidcNodesSorted(getFlowWithSomeInputsHidden(newFlow)),
+              flowType: FlowType.Registration,
+            });
 
-          if (!flowId) {
-            return;
-          }
-
-          handleWalletRegistration(flowId, args.signature, args.address, args.token);
+            disconnect();
+          });
         }}
       />
     );
@@ -43,7 +43,7 @@ interface Props extends PageProps {
   flow: RegistrationFlow;
 }
 export default function RegistrationUI({ flow, config }: Props) {
-  const updatedFlow = getFlowWithOidcNodesSorted(flow);
+  const updatedFlow = getFlowWithOidcNodesSorted(getFlowWithSomeInputsHidden(flow));
 
   return (
     <Web3Provider>

@@ -16,11 +16,6 @@ export function getCsrfToken(flow: LoginFlow | RegistrationFlow): string | undef
   return (csrfNode as UiNodeInputAttributes)?.value;
 }
 
-export function handleFlowError(error: Error) {
-  console.log("error", error);
-  window.location.reload();
-}
-
 export function handleFlowSuccess(success: SuccessfulNativeRegistration | SuccessfulNativeLogin) {
   const redirect = success.continue_with?.find((action) => action.action === "redirect_browser_to");
 
@@ -36,22 +31,19 @@ function getPassword(address: string) {
 }
 
 export async function handleWalletRegistration(
-  flowId: string,
-  signature: string,
-  address: string,
-  token: string,
+  {
+    flow,
+    signature,
+    address,
+    token,
+  }: {
+    flow: RegistrationFlow;
+    signature: string;
+    address: string;
+    token: string;
+  },
+  onError?: (flow: RegistrationFlow, err: unknown) => void,
 ) {
-  const flow = await frontendApi.getRegistrationFlow(
-    {
-      id: flowId,
-    },
-    { credentials: "include" },
-  );
-
-  if (!flow) {
-    return;
-  }
-
   return frontendApi
     .updateRegistrationFlow(
       {
@@ -75,7 +67,9 @@ export async function handleWalletRegistration(
       handleFlowSuccess(registration);
     })
     .catch((error) => {
-      handleFlowError(error);
+      frontendApi
+        .getRegistrationFlow({ id: flow.id }, { credentials: "include" })
+        .then((flow) => onError?.(flow, error));
     });
 }
 

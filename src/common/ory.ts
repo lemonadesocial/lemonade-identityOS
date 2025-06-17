@@ -41,3 +41,19 @@ export function getFlowWithOidcNodesSorted<T extends LoginFlow | RegistrationFlo
     },
   } as T;
 }
+
+export function getFlowWithSomeInputsHidden(flow: RegistrationFlow) {
+  //-- hide some inputs
+  return {
+    ...flow,
+    ui: {
+      ...flow.ui,
+      nodes: flow.ui.nodes.filter(
+        (node) =>
+          !["traits.first_name", "traits.last_name", "traits.wallet"].includes(
+            (node.attributes as UiNodeInputAttributes).name,
+          ),
+      ),
+    },
+  } as RegistrationFlow;
+}
