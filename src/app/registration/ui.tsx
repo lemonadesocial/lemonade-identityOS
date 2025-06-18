@@ -1,8 +1,9 @@
 "use client";
 
-import { FlowType, RegistrationFlow } from "@ory/client-fetch";
+import { FlowType, RegistrationFlow, UiNodeInputAttributes } from "@ory/client-fetch";
 import { OryNodeOidcButtonProps, useOryFlow } from "@ory/elements-react";
-import { DefaultButtonSocial, Registration } from "@ory/elements-react/theme";
+import { DefaultButtonSocial, DefaultFormContainer, Registration } from "@ory/elements-react/theme";
+import { useEffect } from "react";
 
 import { handleWalletRegistration } from "../../client/ory";
 import { overridedComponents } from "../../client/ui";
@@ -39,6 +40,30 @@ function OidcButton(props: OryNodeOidcButtonProps) {
   return <DefaultButtonSocial {...props} />;
 }
 
+function RegistrationFormRoot(props: any) {
+  const { flow, setFlowContainer } = useOryFlow();
+
+  const newNodes = flow.ui.nodes.filter(
+    (node) =>
+      !["traits.first_name", "traits.last_name", "traits.wallet"].includes(
+        (node.attributes as UiNodeInputAttributes).name,
+      ) && node.group !== "password",
+  );
+
+  const hasUnwantedInputs = newNodes.length !== flow.ui.nodes.length;
+
+  useEffect(() => {
+    if (hasUnwantedInputs) {
+      setFlowContainer({
+        flow: { ...flow, ui: { ...flow.ui, nodes: newNodes } } as RegistrationFlow,
+        flowType: FlowType.Registration,
+      });
+    }
+  }, [hasUnwantedInputs, flow, newNodes, setFlowContainer]);
+
+  return hasUnwantedInputs ? null : <DefaultFormContainer {...props} />;
+}
+
 interface Props extends PageProps {
   flow: RegistrationFlow;
 }
@@ -52,6 +77,9 @@ export default function RegistrationUI({ flow, config }: Props) {
           <Registration
             components={{
               ...overridedComponents,
+              Form: {
+                Root: RegistrationFormRoot,
+              },
               Node: {
                 ...overridedComponents?.Node,
                 OidcButton,
