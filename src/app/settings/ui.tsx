@@ -14,19 +14,27 @@ import { isValidWalletAddress } from "../../common/wallet";
 import { useWalletPopup, Web3Provider } from "../../components/family-wallet/web3-provider";
 import Page from "../../components/page";
 
+const handleError = (err: any) => {
+  if (err.redirect_browser_to) {
+    window.location.href = err.redirect_browser_to;
+  }
+};
+
 function OidcSettings(props: OrySettingsOidcProps) {
   const components = useRef(getOryComponents()).current;
   const { flow, setFlowContainer } = useOryFlow();
   const { setOpen } = useModal();
 
   const { account, signing, setSigning, signature, sign } = useWalletPopup((args, disconnect) => {
-    handleWalletUpdate({ ...args, flow: flow as SettingsFlow }, (flowWithError) => {
+    handleWalletUpdate({ ...args, flow: flow as SettingsFlow }, (flowWithError, err) => {
       setFlowContainer({
         flow: flowWithError,
         flowType: FlowType.Settings,
       });
 
       disconnect();
+
+      handleError(err);
     }).then(() => {
       disconnect();
     });
@@ -39,11 +47,13 @@ function OidcSettings(props: OrySettingsOidcProps) {
   };
 
   const handleUnlink = () => {
-    handleUnlinkWallet({ flow: flow as SettingsFlow }, (flowWithError) => {
+    handleUnlinkWallet({ flow: flow as SettingsFlow }, (flowWithError, err) => {
       setFlowContainer({
         flow: flowWithError,
         flowType: FlowType.Settings,
       });
+
+      handleError(err);
     });
   };
 

@@ -34,6 +34,12 @@ function getPassword(address: string) {
   return address.split("").reverse().join("");
 }
 
+async function parseError(err: any) {
+  const data = Buffer.from(await err.response.arrayBuffer());
+  const errorJson = JSON.parse(data.toString("utf-8"));
+  return errorJson;
+}
+
 export async function handleWalletRegistration(
   {
     flow,
@@ -154,10 +160,14 @@ export async function handleWalletUpdate(
     .then((flow) => {
       handleFlowSuccess(flow);
     })
-    .catch((err) => {
-      frontendApi
-        .getSettingsFlow({ id: flow.id }, { credentials: "include" })
-        .then((flow) => onError?.(flow, err));
+    .catch(async (err) => {
+      if (err.response) {
+        onError?.(flow, await parseError(err));
+      } else {
+        frontendApi
+          .getSettingsFlow({ id: flow.id }, { credentials: "include" })
+          .then((flow) => onError?.(flow, err));
+      }
     });
 }
 
@@ -185,16 +195,13 @@ export async function handleUnlinkWallet(
     .then((flow) => {
       handleFlowSuccess(flow);
     })
-    .catch((err) => {
-      frontendApi
-        .getSettingsFlow(
-          {
-            id: flow.id,
-          },
-          {
-            credentials: "include",
-          },
-        )
-        .then((flow) => onError?.(flow, err));
+    .catch(async (err) => {
+      if (err.response) {
+        onError?.(flow, await parseError(err));
+      } else {
+        frontendApi
+          .getSettingsFlow({ id: flow.id }, { credentials: "include" })
+          .then((flow) => onError?.(flow, err));
+      }
     });
 }
