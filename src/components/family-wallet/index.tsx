@@ -1,12 +1,9 @@
 "use client";
 
 import { ConnectKitButton } from "connectkit";
-import { useEffect, useState } from "react";
-import { useAccount, useSignMessage, useDisconnect } from "wagmi";
-
-import { getUserWalletRequest } from "../../client/api";
 
 import Spinner from "./spinner.svg";
+import { useWalletPopup } from "./web3-provider";
 
 //-- this style is copied from ory default social button theme
 const buttonClassName =
@@ -19,66 +16,7 @@ interface Props {
   ) => void;
 }
 export default function FamilyWallet({ onLogin }: Props) {
-  const account = useAccount();
-  const { disconnect } = useDisconnect();
-  const { signMessage } = useSignMessage();
-
-  const [signing, setSigning] = useState(false);
-  const [signature, setSignature] = useState("");
-  const [token, setToken] = useState("");
-
-  const sign = async () => {
-    if (!account.address) {
-      return;
-    }
-
-    setSignature("");
-
-    //-- request payload from backend
-    const data = await getUserWalletRequest(account.address);
-
-    const message = data.message;
-    setToken(data.token);
-
-    signMessage(
-      { message },
-      {
-        onSettled: () => {
-          setSigning(false);
-        },
-        onSuccess: (signature) => {
-          setSignature(signature);
-        },
-        onError: () => {
-          if (account.isConnected) {
-            disconnect();
-          }
-        },
-      },
-    );
-  };
-
-  useEffect(() => {
-    if (signature && account.address && token) {
-      onLogin({ signature, address: account.address, token }, disconnect);
-    }
-  }, [signature, account.address, token]);
-
-  useEffect(() => {
-    if (account.isDisconnected) {
-      setSignature("");
-    }
-  }, [account.isDisconnected]);
-
-  useEffect(() => {
-    if (account.isConnected && !signing && !signature) {
-      setSigning(true);
-
-      //-- note: ARC browser will show two signature requests in case of metamask,
-      //-- we can set timeout to the sign call if we want to support this browser
-      sign();
-    }
-  }, [account.isConnected, signing, signature]);
+  const { signing, signature } = useWalletPopup(onLogin);
 
   return (
     <ConnectKitButton.Custom>

@@ -1,7 +1,17 @@
-import { WagmiProvider, createConfig, http } from "wagmi";
-import { mainnet } from "wagmi/chains";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ConnectKitProvider, getDefaultConfig } from "connectkit";
+import { useEffect, useState } from "react";
+import {
+  WagmiProvider,
+  createConfig,
+  http,
+  useAccount,
+  useDisconnect,
+  useSignMessage,
+} from "wagmi";
+import { mainnet } from "wagmi/chains";
+
+import { getUserWalletRequest } from "../../client/api";
 
 const config = createConfig(
   getDefaultConfig({
@@ -37,4 +47,74 @@ export const Web3Provider = ({ children }: { children: React.ReactNode }) => {
       </QueryClientProvider>
     </WagmiProvider>
   );
+};
+
+export const useWalletPopup = (
+  onLogin: (
+    args: { signature: string; address: string; token: string },
+    disconnect: () => void,
+  ) => void,
+) => {
+  const account = useAccount();
+  const { disconnect } = useDisconnect();
+  const { signMessage } = useSignMessage();
+
+  const [signing, setSigning] = useState(false);
+  const [signature, setSignature] = useState("");
+  const [token, setToken] = useState("");
+
+  const sign = async () => {
+    if (!account.address) {
+      return;
+    }
+
+    setSignature("");
+
+    //-- request payload from backend
+    const data = await getUserWalletRequest(account.address);
+
+    const message = data.message;
+    setToken(data.token);
+
+    signMessage(
+      { message },
+      {
+        onSettled: () => {
+          setSigning(false);
+        },
+        onSuccess: (signature) => {
+          setSignature(signature);
+        },
+        onError: () => {
+          if (account.isConnected) {
+            disconnect();
+          }
+        },
+      },
+    );
+  };
+
+  useEffect(() => {
+    if (signature && account.address && token) {
+      onLogin({ signature, address: account.address, token }, disconnect);
+    }
+  }, [signature, account.address, token]);
+
+  useEffect(() => {
+    if (account.isDisconnected) {
+      setSignature("");
+    }
+  }, [account.isDisconnected]);
+
+  useEffect(() => {
+    if (account.isConnected && !signing && !signature) {
+      setSigning(true);
+
+      //-- note: ARC browser will show two signature requests in case of metamask,
+      //-- we can set timeout to the sign call if we want to support this browser
+      sign();
+    }
+  }, [account.isConnected, signing, signature]);
+
+  return { signing, signature };
 };

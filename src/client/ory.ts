@@ -116,3 +116,76 @@ export async function handleWalletLogin(
         .then((flow) => onError?.(flow, err));
     });
 }
+
+export async function handleWalletUpdate(
+  {
+    flow,
+    signature,
+    address,
+    token,
+  }: {
+    flow: SettingsFlow;
+    signature: string;
+    address: string;
+    token: string;
+  },
+  onError?: (flow: SettingsFlow, err: unknown) => void,
+) {
+  return frontendApi
+    .updateSettingsFlow(
+      {
+        flow: flow.id,
+        updateSettingsFlowBody: {
+          method: "profile",
+          csrf_token: getCsrfToken(flow),
+          traits: {
+            ...flow.identity.traits,
+            wallet: address,
+          },
+          transient_payload: {
+            wallet_signature: signature,
+            wallet_signature_token: token,
+          },
+        },
+      },
+      { credentials: "include" },
+    )
+    .then((login) => {
+      handleFlowSuccess(login);
+    })
+    .catch((err) => {
+      frontendApi
+        .getSettingsFlow({ id: flow.id }, { credentials: "include" })
+        .then((flow) => onError?.(flow, err));
+    });
+}
+
+export async function handleUnlinkWallet({ flow }: { flow: SettingsFlow }) {
+  await frontendApi.updateSettingsFlow(
+    {
+      flow: flow.id,
+      updateSettingsFlowBody: {
+        method: "profile",
+        csrf_token: getCsrfToken(flow as SettingsFlow),
+        traits: {
+          ...flow.identity.traits,
+          wallet: null,
+        },
+      },
+    },
+    {
+      credentials: "include",
+    },
+  );
+
+  const updatedFlow = await frontendApi.getSettingsFlow(
+    {
+      id: flow.id,
+    },
+    {
+      credentials: "include",
+    },
+  );
+
+  return updatedFlow;
+}

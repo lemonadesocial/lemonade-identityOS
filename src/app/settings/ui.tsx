@@ -3,56 +3,46 @@
 import { FlowType, SettingsFlow, UiNode } from "@ory/client-fetch";
 import { OrySettingsOidcProps, useOryFlow } from "@ory/elements-react";
 import { getOryComponents, Settings } from "@ory/elements-react/theme";
+import { useModal } from "connectkit";
 import { useRef } from "react";
 
-import { getCsrfToken } from "../../client/ory";
+import { handleUnlinkWallet, handleWalletUpdate } from "../../client/ory";
 import { overridedComponents } from "../../client/ui";
 
-import { frontendApi } from "../../common/ory";
 import { type PageProps } from "../../common/types";
+import { useWalletPopup, Web3Provider } from "../../components/family-wallet/web3-provider";
 import Page from "../../components/page";
 
 function OidcSettings(props: OrySettingsOidcProps) {
   const components = useRef(getOryComponents()).current;
   const { flow, setFlowContainer } = useOryFlow();
+  const { setOpen } = useModal();
+
+  useWalletPopup((args, disconnect) => {
+    handleWalletUpdate({ ...args, flow: flow as SettingsFlow }, (newFlow) => {
+      setFlowContainer({
+        flow: newFlow,
+        flowType: FlowType.Settings,
+      });
+
+      disconnect();
+    });
+  });
 
   if (!flow) return null;
 
   const hasWallet = !!(flow as SettingsFlow).identity.traits.wallet;
 
-  const handleLinkWallet = async () => {
-    console.log("link wallet");
+  const handleLink = async () => {
+    setOpen(true);
   };
 
-  const handleUnlinkWallet = async () => {
-    await frontendApi.updateSettingsFlow(
-      {
-        flow: flow.id,
-        updateSettingsFlowBody: {
-          method: "profile",
-          csrf_token: getCsrfToken(flow as SettingsFlow),
-          traits: {
-            wallet: null,
-          },
-        },
-      },
-      {
-        credentials: "include",
-      },
-    );
-
-    const updatedFlow = await frontendApi.getSettingsFlow(
-      {
-        id: flow.id,
-      },
-      {
-        credentials: "include",
-      },
-    );
-
-    setFlowContainer({
-      flow: updatedFlow,
-      flowType: FlowType.Settings,
+  const handleUnlink = () => {
+    handleUnlinkWallet({ flow: flow as SettingsFlow }).then((newFlow) => {
+      setFlowContainer({
+        flow: newFlow,
+        flowType: FlowType.Settings,
+      });
     });
   };
 
@@ -85,7 +75,7 @@ function OidcSettings(props: OrySettingsOidcProps) {
               },
               type: "input",
             } as UiNode),
-            onClick: handleLinkWallet,
+            onClick: handleLink,
           },
         ]),
   ];
@@ -115,7 +105,7 @@ function OidcSettings(props: OrySettingsOidcProps) {
             },
             type: "input",
           } as UiNode),
-          onClick: handleUnlinkWallet,
+          onClick: handleUnlink,
         },
       ]
     : props.unlinkButtons;
@@ -173,17 +163,19 @@ export default function SettingsUI({ flow, config }: Props) {
   };
 
   return (
-    <Page>
-      <Settings
-        flow={updatedFlow}
-        config={config}
-        components={{
-          ...overridedComponents,
-          Form: {
-            OidcSettings,
-          },
-        }}
-      />
-    </Page>
+    <Web3Provider>
+      <Page>
+        <Settings
+          flow={updatedFlow}
+          config={config}
+          components={{
+            ...overridedComponents,
+            Form: {
+              OidcSettings,
+            },
+          }}
+        />
+      </Page>
+    </Web3Provider>
   );
 }
