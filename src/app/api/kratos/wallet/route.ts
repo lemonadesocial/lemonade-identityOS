@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
     ...bodyRest
   }: {
     identity: {
-      wallet?: string;
+      traits: { wallet?: string };
     };
     transient_payload?: {
       wallet_signature?: string;
@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
   } = await request.json();
 
   //-- this is not a wallet registration, so we can just return the body
-  if (!bodyRest.identity.wallet) {
+  if (!bodyRest.identity.traits.wallet) {
     return NextResponse.json(bodyRest);
   }
 
@@ -34,7 +34,10 @@ export async function POST(request: NextRequest) {
     transient_payload.wallet_signature_token,
   );
 
-  assert.ok(signer.toLowerCase() === bodyRest.identity.wallet.toLowerCase(), "invalid signature");
+  assert.ok(
+    signer.toLowerCase() === bodyRest.identity.traits.wallet.toLowerCase(),
+    "invalid signature",
+  );
 
   return NextResponse.json(bodyRest);
 }
