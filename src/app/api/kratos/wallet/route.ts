@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
     ...bodyRest
   }: {
     identity: {
-      traits: { wallet?: string };
+      traits: { wallet?: string; email?: string };
       metadata_public?: {
         verified_wallet?: string;
       };
@@ -23,8 +23,14 @@ export async function POST(request: NextRequest) {
 
   const wallet = bodyRest.identity.traits.wallet?.toLowerCase();
 
+  const isValidWallet = isValidWalletAddress(wallet);
+
+  if (!isValidWallet) {
+    assert.ok(bodyRest.identity.traits.email, "email is required when wallet is missing");
+  }
+
   if (
-    !isValidWalletAddress(wallet) ||
+    !isValidWallet ||
     (wallet && wallet === bodyRest.identity.metadata_public?.verified_wallet?.toLowerCase())
   ) {
     return NextResponse.json(bodyRest);

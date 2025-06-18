@@ -5,6 +5,7 @@ import {
   SuccessfulNativeLogin,
   SuccessfulNativeRegistration,
   UiNodeInputAttributes,
+  UpdateSettingsFlowBody,
 } from "@ory/client-fetch";
 
 import { frontendApi } from "../common/ory";
@@ -124,6 +125,49 @@ export async function handleWalletLogin(
     });
 }
 
+async function handleSettingsFlowError(
+  flow: SettingsFlow,
+  err: any,
+  onError?: (flow: SettingsFlow, err: unknown) => void,
+) {
+  if (err.response) {
+    const error = await parseError(err);
+    if (error.error) {
+      //-- this is a normal ory error
+      onError?.(flow, error);
+    } else {
+      //-- error here is the new flow
+      onError?.(error, null);
+    }
+  } else {
+    frontendApi
+      .getSettingsFlow({ id: flow.id }, { credentials: "include" })
+      .then((flow) => onError?.(flow, err));
+  }
+}
+
+export async function handleProfileUpdate(
+  {
+    flow,
+    data,
+  }: {
+    flow: SettingsFlow;
+    data: UpdateSettingsFlowBody;
+  },
+  onError?: (flow: SettingsFlow, err: unknown) => void,
+) {
+  return frontendApi
+    .updateSettingsFlow(
+      {
+        flow: flow.id,
+        updateSettingsFlowBody: data,
+      },
+      { credentials: "include" },
+    )
+    .then((flow) => handleFlowSuccess(flow as SettingsFlow))
+    .catch((err) => handleSettingsFlowError(flow, err, onError));
+}
+
 export async function handleWalletUpdate(
   {
     flow,
@@ -173,22 +217,7 @@ export async function handleWalletUpdate(
       ),
     )
     .then((flow) => handleFlowSuccess(flow as SettingsFlow))
-    .catch(async (err) => {
-      if (err.response) {
-        const error = await parseError(err);
-        if (error.error) {
-          //-- this is a normal ory error
-          onError?.(flow, error);
-        } else {
-          //-- error here is the new flow
-          onError?.(error, null);
-        }
-      } else {
-        frontendApi
-          .getSettingsFlow({ id: flow.id }, { credentials: "include" })
-          .then((flow) => onError?.(flow, err));
-      }
-    });
+    .catch((err) => handleSettingsFlowError(flow, err, onError));
 }
 
 export async function handleUnlinkWallet(
@@ -215,13 +244,5 @@ export async function handleUnlinkWallet(
     .then((flow) => {
       handleFlowSuccess(flow);
     })
-    .catch(async (err) => {
-      if (err.response) {
-        onError?.(flow, await parseError(err));
-      } else {
-        frontendApi
-          .getSettingsFlow({ id: flow.id }, { credentials: "include" })
-          .then((flow) => onError?.(flow, err));
-      }
-    });
+    .catch((err) => handleSettingsFlowError(flow, err, onError));
 }
