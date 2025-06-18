@@ -47,13 +47,14 @@ export async function POST(request: NextRequest) {
 
   const wallet = bodyRest.identity.traits.wallet?.toLowerCase();
   const email = bodyRest.identity.traits.email;
+  const isWalletValid = isValidWalletAddress(wallet);
 
-  if (!email && !wallet) {
-    return returnError("email or wallet is required");
+  if (!email && !isWalletValid) {
+    return returnError("Either email or wallet is required");
   }
 
   if (
-    !isValidWalletAddress(wallet) ||
+    !isWalletValid ||
     (wallet && wallet === bodyRest.identity.metadata_public?.verified_wallet?.toLowerCase())
   ) {
     return NextResponse.json(bodyRest);
@@ -64,7 +65,7 @@ export async function POST(request: NextRequest) {
     !transient_payload?.wallet_signature ||
     !transient_payload?.wallet_signature_token
   ) {
-    return returnError("signature and token are required");
+    return returnError("Wallet signature and token are required");
   }
 
   const signer = await verifySignerFromSignatureAndToken(
@@ -73,7 +74,7 @@ export async function POST(request: NextRequest) {
   );
 
   if (signer.toLowerCase() !== wallet) {
-    return returnError("invalid signature");
+    return returnError("Invalid wallet signature");
   }
 
   return NextResponse.json({
