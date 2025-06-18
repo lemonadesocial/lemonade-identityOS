@@ -4,6 +4,30 @@ import { NextRequest, NextResponse } from "next/server";
 import { isValidWalletAddress } from "../../../../common/wallet";
 import { verifySignerFromSignatureAndToken } from "../../../../server/wallet";
 
+function returnError(message: string) {
+  return new NextResponse(
+    JSON.stringify({
+      messages: [
+        {
+          messages: [
+            {
+              id: 1,
+              text: message,
+              type: "error",
+            },
+          ],
+        },
+      ],
+    }),
+    {
+      status: 400,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    },
+  );
+}
+
 export async function POST(request: NextRequest) {
   const {
     transient_payload,
@@ -22,34 +46,35 @@ export async function POST(request: NextRequest) {
   } = await request.json();
 
   const wallet = bodyRest.identity.traits.wallet?.toLowerCase();
+  const email = bodyRest.identity.traits.email;
 
-  const isValidWallet = isValidWalletAddress(wallet);
-
-  if (!isValidWallet) {
-    assert.ok(bodyRest.identity.traits.email, "email is required when wallet is missing");
+  if (!email && !wallet) {
+    return returnError("email or wallet is required");
   }
 
   if (
-    !isValidWallet ||
+    !isValidWalletAddress(wallet) ||
     (wallet && wallet === bodyRest.identity.metadata_public?.verified_wallet?.toLowerCase())
   ) {
     return NextResponse.json(bodyRest);
   }
 
-  assert.ok(
-    wallet &&
-      transient_payload &&
-      transient_payload.wallet_signature &&
-      transient_payload.wallet_signature_token,
-    "signature and token are required",
-  );
+  if (
+    !wallet ||
+    !transient_payload?.wallet_signature ||
+    !transient_payload?.wallet_signature_token
+  ) {
+    return returnError("signature and token are required");
+  }
 
   const signer = await verifySignerFromSignatureAndToken(
     transient_payload.wallet_signature,
     transient_payload.wallet_signature_token,
   );
 
-  assert.ok(signer.toLowerCase() === wallet, "invalid signature");
+  if (signer.toLowerCase() !== wallet) {
+    return returnError("invalid signature");
+  }
 
   return NextResponse.json({
     ...bodyRest,
