@@ -1,6 +1,7 @@
 "use client";
 
 import { ConnectKitButton } from "connectkit";
+import { useEffect } from "react";
 
 import Spinner from "./spinner.svg";
 import { useWalletPopup } from "./web3-provider";
@@ -16,7 +17,17 @@ interface Props {
   ) => void;
 }
 export default function FamilyWallet({ onLogin }: Props) {
-  const { signing, signature } = useWalletPopup(onLogin);
+  const { account, signing, setSigning, signature, sign } = useWalletPopup(onLogin);
+
+  useEffect(() => {
+    if (account.isConnected && !signing && !signature) {
+      setSigning(true);
+
+      //-- note: ARC browser will show two signature requests in case of metamask,
+      //-- we can set timeout to the sign call if we want to support this browser
+      sign();
+    }
+  }, [account.isConnected, signing, signature]);
 
   return (
     <ConnectKitButton.Custom>

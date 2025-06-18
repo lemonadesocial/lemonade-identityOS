@@ -4,7 +4,7 @@ import { FlowType, SettingsFlow, UiNode } from "@ory/client-fetch";
 import { OrySettingsOidcProps, useOryFlow } from "@ory/elements-react";
 import { getOryComponents, Settings } from "@ory/elements-react/theme";
 import { useModal } from "connectkit";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import { handleUnlinkWallet, handleWalletUpdate } from "../../client/ory";
 import { overridedComponents } from "../../client/ui";
@@ -19,7 +19,7 @@ function OidcSettings(props: OrySettingsOidcProps) {
   const { flow, setFlowContainer } = useOryFlow();
   const { setOpen } = useModal();
 
-  useWalletPopup((args, disconnect) => {
+  const { account, signing, setSigning, signature, sign } = useWalletPopup((args, disconnect) => {
     handleWalletUpdate({ ...args, flow: flow as SettingsFlow }, (flowWithError) => {
       setFlowContainer({
         flow: flowWithError,
@@ -27,10 +27,10 @@ function OidcSettings(props: OrySettingsOidcProps) {
       });
 
       disconnect();
+    }).then(() => {
+      disconnect();
     });
   });
-
-  if (!flow) return null;
 
   const hasWallet = isValidWalletAddress((flow as SettingsFlow).identity.traits.wallet);
 
@@ -110,6 +110,16 @@ function OidcSettings(props: OrySettingsOidcProps) {
         },
       ]
     : props.unlinkButtons;
+
+  useEffect(() => {
+    if (account.isConnected && !signing && !signature && !hasWallet) {
+      setSigning(true);
+
+      //-- note: ARC browser will show two signature requests in case of metamask,
+      //-- we can set timeout to the sign call if we want to support this browser
+      sign();
+    }
+  }, [account.isConnected, signing, signature, hasWallet]);
 
   return (
     <components.Form.OidcSettings

@@ -106,15 +106,5 @@ export const useWalletPopup = (
     }
   }, [account.isDisconnected]);
 
-  useEffect(() => {
-    if (account.isConnected && !signing && !signature) {
-      setSigning(true);
-
-      //-- note: ARC browser will show two signature requests in case of metamask,
-      //-- we can set timeout to the sign call if we want to support this browser
-      sign();
-    }
-  }, [account.isConnected, signing, signature]);
-
-  return { signing, signature };
+  return { account, signing, signature, setSigning, sign };
 };
