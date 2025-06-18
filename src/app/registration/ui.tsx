@@ -24,6 +24,8 @@ function OidcButton(props: OryNodeOidcButtonProps) {
     return (
       <FamilyWallet
         onLogin={(args, disconnect) => {
+          disconnect();
+
           handleWalletRegistration({ ...args, flow: flow as RegistrationFlow }, (newFlow) => {
             setFlowContainer({
               flow: getFlowWithOidcNodesSorted(getFlowWithSomeInputsHidden(newFlow)),

@@ -26,6 +26,8 @@ function OidcSettings(props: OrySettingsOidcProps) {
   const { setOpen } = useModal();
 
   const { account, signing, setSigning, signature, sign } = useWalletPopup((args, disconnect) => {
+    disconnect();
+
     handleWalletUpdate({ ...args, flow: flow as SettingsFlow }, (flowWithError, err) => {
       setFlowContainer({
         flow: flowWithError,
@@ -35,8 +37,6 @@ function OidcSettings(props: OrySettingsOidcProps) {
       disconnect();
 
       handleError(err);
-    }).then(() => {
-      disconnect();
     });
   });
 
