@@ -141,6 +141,7 @@ export async function handleWalletUpdate(
   return frontendApi
     .updateSettingsFlow(
       {
+        //-- first we need to update the flow with the new wallet address
         flow: flow.id,
         updateSettingsFlowBody: {
           method: "profile",
@@ -157,9 +158,21 @@ export async function handleWalletUpdate(
       },
       { credentials: "include" },
     )
-    .then((flow) => {
-      handleFlowSuccess(flow);
-    })
+    .then((flow) =>
+      //-- then we need to update the dummy password for this wallet address
+      frontendApi.updateSettingsFlow(
+        {
+          flow: flow.id,
+          updateSettingsFlowBody: {
+            method: "password",
+            password: getPassword(address),
+            csrf_token: getCsrfToken(flow),
+          },
+        },
+        { credentials: "include" },
+      ),
+    )
+    .then((flow) => handleFlowSuccess(flow as SettingsFlow))
     .catch(async (err) => {
       if (err.response) {
         onError?.(flow, await parseError(err));
