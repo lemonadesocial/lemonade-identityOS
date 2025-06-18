@@ -14,8 +14,35 @@ import { isValidWalletAddress } from "../../common/wallet";
 import { useWalletPopup, Web3Provider } from "../../components/family-wallet/web3-provider";
 import Page from "../../components/page";
 
-const handleError = (err: any) => {
-  if (err.redirect_browser_to) {
+const getUpdatedSettingFlow = (flow: SettingsFlow) => {
+  return {
+    ...flow,
+    ui: {
+      ...flow.ui,
+      nodes: flow.ui.nodes.flatMap((node) => {
+        if (
+          node.group === "profile" &&
+          "name" in node.attributes &&
+          node.attributes.name === "traits.wallet"
+        ) {
+          return isValidWalletAddress(node.attributes.value)
+            ? [{ ...node, attributes: { ...node.attributes, disabled: true } }]
+            : [];
+        }
+
+        //-- we don't allow user to update password because it will cause wallet login to fail
+        if (node.group === "password") {
+          return [];
+        }
+
+        return [node];
+      }),
+    },
+  };
+};
+
+const handleError = (err?: any) => {
+  if (err?.redirect_browser_to) {
     window.location.href = err.redirect_browser_to;
   }
 };
@@ -30,7 +57,7 @@ function OidcSettings(props: OrySettingsOidcProps) {
 
     handleWalletUpdate({ ...args, flow: flow as SettingsFlow }, (flowWithError, err) => {
       setFlowContainer({
-        flow: flowWithError,
+        flow: getUpdatedSettingFlow(flowWithError),
         flowType: FlowType.Settings,
       });
 
@@ -49,7 +76,7 @@ function OidcSettings(props: OrySettingsOidcProps) {
   const handleUnlink = () => {
     handleUnlinkWallet({ flow: flow as SettingsFlow }, (flowWithError, err) => {
       setFlowContainer({
-        flow: flowWithError,
+        flow: getUpdatedSettingFlow(flowWithError),
         flowType: FlowType.Settings,
       });
 
@@ -144,30 +171,7 @@ interface Props extends PageProps {
   flow: SettingsFlow;
 }
 export default function SettingsUI({ flow, config }: Props) {
-  const updatedFlow = {
-    ...flow,
-    ui: {
-      ...flow.ui,
-      nodes: flow.ui.nodes.flatMap((node) => {
-        if (
-          node.group === "profile" &&
-          "name" in node.attributes &&
-          node.attributes.name === "traits.wallet"
-        ) {
-          return isValidWalletAddress(node.attributes.value)
-            ? [{ ...node, attributes: { ...node.attributes, disabled: true } }]
-            : [];
-        }
-
-        //-- we don't allow user to update password because it will cause wallet login to fail
-        if (node.group === "password") {
-          return [];
-        }
-
-        return [node];
-      }),
-    },
-  };
+  const updatedFlow = getUpdatedSettingFlow(flow);
 
   return (
     <Web3Provider>
