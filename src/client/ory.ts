@@ -22,9 +22,21 @@ export function getCsrfToken(
 }
 
 export function handleFlowSuccess(success: SuccessfulNativeRegistration | SuccessfulNativeLogin) {
+  const verification = success.continue_with?.find(
+    (action) => action.action === "show_verification_ui",
+  );
   const redirect = success.continue_with?.find((action) => action.action === "redirect_browser_to");
 
-  if (redirect) {
+  if (verification?.flow.url) {
+    //-- prioritize verification over redirect
+    const url = new URL(verification.flow.url);
+
+    if (!url.searchParams.has("return_to")) {
+      url.searchParams.set("return_to", window.location.href);
+    }
+
+    window.location.href = url.toString();
+  } else if (redirect) {
     window.location.href = redirect.redirect_browser_to;
   }
 }
