@@ -7,5 +7,5 @@ export function getDiscardedWalletAddress(wallet: string) {
 }
 
 export function isValidWalletAddress(wallet?: string) {
-  return wallet && !wallet.startsWith("_");
+  return !!wallet && !wallet.startsWith("_");
 }
