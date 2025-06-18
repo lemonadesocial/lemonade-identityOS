@@ -175,8 +175,14 @@ export async function handleWalletUpdate(
     .then((flow) => handleFlowSuccess(flow as SettingsFlow))
     .catch(async (err) => {
       if (err.response) {
-        //-- this is the new flow
-        onError?.(await parseError(err), null);
+        const error = await parseError(err);
+        if (error.error) {
+          //-- this is a normal ory error
+          onError?.(flow, error);
+        } else {
+          //-- error here is the new flow
+          onError?.(error, null);
+        }
       } else {
         frontendApi
           .getSettingsFlow({ id: flow.id }, { credentials: "include" })

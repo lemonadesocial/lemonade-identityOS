@@ -11,6 +11,9 @@ export async function POST(request: NextRequest) {
   }: {
     identity: {
       traits: { wallet?: string };
+      metadata_public?: {
+        verified_wallet?: string;
+      };
     };
     transient_payload?: {
       wallet_signature?: string;
@@ -18,10 +21,12 @@ export async function POST(request: NextRequest) {
     };
   } = await request.json();
 
-  //-- this is not a wallet registration, so we can just return the body
-  const wallet = bodyRest.identity.traits.wallet;
+  const wallet = bodyRest.identity.traits.wallet?.toLowerCase();
 
-  if (!isValidWalletAddress(wallet)) {
+  if (
+    !isValidWalletAddress(wallet) ||
+    (wallet && wallet === bodyRest.identity.metadata_public?.verified_wallet?.toLowerCase())
+  ) {
     return NextResponse.json(bodyRest);
   }
 
@@ -38,7 +43,16 @@ export async function POST(request: NextRequest) {
     transient_payload.wallet_signature_token,
   );
 
-  assert.ok(signer.toLowerCase() === wallet.toLowerCase(), "invalid signature");
+  assert.ok(signer.toLowerCase() === wallet, "invalid signature");
 
-  return NextResponse.json(bodyRest);
+  return NextResponse.json({
+    ...bodyRest,
+    identity: {
+      ...bodyRest.identity,
+      metadata_public: {
+        ...bodyRest.identity.metadata_public,
+        verified_wallet: wallet,
+      },
+    },
+  });
 }
