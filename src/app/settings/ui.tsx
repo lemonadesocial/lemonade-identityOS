@@ -159,6 +159,11 @@ export default function SettingsUI({ flow, config }: Props) {
             : [];
         }
 
+        //-- we don't allow user to update password because it will cause wallet login to fail
+        if (node.group === "password") {
+          return [];
+        }
+
         return [node];
       }),
     },
