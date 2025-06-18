@@ -71,11 +71,15 @@ export function getFlowWithMutatedIndentifierInputNode(flow: LoginFlow) {
         ) {
           return {
             ...node,
+            attributes: {
+              ...node.attributes,
+              value: "",
+            },
             meta: {
               ...node.meta,
               label: {
                 ...node.meta.label,
-                id: 1070007, // <-- email
+                id: 1070007, // <-- email label id
               },
             },
           };

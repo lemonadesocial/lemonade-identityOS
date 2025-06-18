@@ -80,6 +80,7 @@ export default function RegistrationUI({ flow, config }: Props) {
             components={{
               ...overridedComponents,
               Form: {
+                ...overridedComponents?.Form,
                 Root: RegistrationFormRoot,
               },
               Node: {

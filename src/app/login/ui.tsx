@@ -1,8 +1,9 @@
 "use client";
 
-import { FlowType, LoginFlow } from "@ory/client-fetch";
+import { FlowType, LoginFlow, UiNodeInputAttributes } from "@ory/client-fetch";
 import { OryNodeOidcButtonProps, useOryFlow } from "@ory/elements-react";
-import { DefaultButtonSocial, Login } from "@ory/elements-react/theme";
+import { DefaultButtonSocial, DefaultFormContainer, Login } from "@ory/elements-react/theme";
+import { useEffect } from "react";
 
 import { handleWalletLogin } from "../../client/ory";
 import { overridedComponents } from "../../client/ui";
@@ -31,7 +32,9 @@ function OidcButton(props: OryNodeOidcButtonProps) {
 
           handleWalletLogin({ ...args, flow: flow as LoginFlow }, (newFlow) => {
             setFlowContainer({
-              flow: getFlowWithOidcNodesSorted(newFlow),
+              flow: getFlowWithMutatedIndentifierInputNode(
+                getFlowWithOidcNodesSorted(getFlowWithSomeInputsHidden(newFlow)),
+              ),
               flowType: FlowType.Login,
             });
 
@@ -43,6 +46,30 @@ function OidcButton(props: OryNodeOidcButtonProps) {
   }
 
   return <DefaultButtonSocial {...props} />;
+}
+
+function LoginFormRoot(props: any) {
+  const { flow, setFlowContainer } = useOryFlow();
+
+  const newNodes = flow.ui.nodes.filter(
+    (node) =>
+      !["traits.first_name", "traits.last_name", "traits.wallet"].includes(
+        (node.attributes as UiNodeInputAttributes).name,
+      ) && node.group !== "password",
+  );
+
+  const hasUnwantedInputs = newNodes.length !== flow.ui.nodes.length;
+
+  useEffect(() => {
+    if (hasUnwantedInputs) {
+      setFlowContainer({
+        flow: { ...flow, ui: { ...flow.ui, nodes: newNodes } } as LoginFlow,
+        flowType: FlowType.Login,
+      });
+    }
+  }, [hasUnwantedInputs, flow, newNodes, setFlowContainer]);
+
+  return hasUnwantedInputs ? null : <DefaultFormContainer {...props} />;
 }
 
 interface Props extends PageProps {
@@ -62,6 +89,10 @@ export default function LoginUI({ flow, config }: Props) {
             config={config}
             components={{
               ...overridedComponents,
+              Form: {
+                ...overridedComponents?.Form,
+                Root: LoginFormRoot,
+              },
               Node: {
                 ...overridedComponents?.Node,
                 OidcButton,
