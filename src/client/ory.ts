@@ -8,6 +8,7 @@ import {
 } from "@ory/client-fetch";
 
 import { frontendApi } from "../common/ory";
+import { getDiscardedWalletAddress } from "../common/wallet";
 
 export function getCsrfToken(
   flow: LoginFlow | RegistrationFlow | SettingsFlow,
@@ -150,8 +151,8 @@ export async function handleWalletUpdate(
       },
       { credentials: "include" },
     )
-    .then((login) => {
-      handleFlowSuccess(login);
+    .then((flow) => {
+      handleFlowSuccess(flow);
     })
     .catch((err) => {
       frontendApi
@@ -160,32 +161,40 @@ export async function handleWalletUpdate(
     });
 }
 
-export async function handleUnlinkWallet({ flow }: { flow: SettingsFlow }) {
-  await frontendApi.updateSettingsFlow(
-    {
-      flow: flow.id,
-      updateSettingsFlowBody: {
-        method: "profile",
-        csrf_token: getCsrfToken(flow as SettingsFlow),
-        traits: {
-          ...flow.identity.traits,
-          wallet: null,
+export async function handleUnlinkWallet(
+  { flow }: { flow: SettingsFlow },
+  onError?: (flow: SettingsFlow, err: unknown) => void,
+) {
+  frontendApi
+    .updateSettingsFlow(
+      {
+        flow: flow.id,
+        updateSettingsFlowBody: {
+          method: "profile",
+          csrf_token: getCsrfToken(flow as SettingsFlow),
+          traits: {
+            ...flow.identity.traits,
+            wallet: getDiscardedWalletAddress(flow.identity.traits.wallet),
+          },
         },
       },
-    },
-    {
-      credentials: "include",
-    },
-  );
-
-  const updatedFlow = await frontendApi.getSettingsFlow(
-    {
-      id: flow.id,
-    },
-    {
-      credentials: "include",
-    },
-  );
-
-  return updatedFlow;
+      {
+        credentials: "include",
+      },
+    )
+    .then((flow) => {
+      handleFlowSuccess(flow);
+    })
+    .catch((err) => {
+      frontendApi
+        .getSettingsFlow(
+          {
+            id: flow.id,
+          },
+          {
+            credentials: "include",
+          },
+        )
+        .then((flow) => onError?.(flow, err));
+    });
 }

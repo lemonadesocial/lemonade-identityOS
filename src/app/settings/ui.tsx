@@ -10,6 +10,7 @@ import { handleUnlinkWallet, handleWalletUpdate } from "../../client/ory";
 import { overridedComponents } from "../../client/ui";
 
 import { type PageProps } from "../../common/types";
+import { isValidWalletAddress } from "../../common/wallet";
 import { useWalletPopup, Web3Provider } from "../../components/family-wallet/web3-provider";
 import Page from "../../components/page";
 
@@ -19,9 +20,9 @@ function OidcSettings(props: OrySettingsOidcProps) {
   const { setOpen } = useModal();
 
   useWalletPopup((args, disconnect) => {
-    handleWalletUpdate({ ...args, flow: flow as SettingsFlow }, (newFlow) => {
+    handleWalletUpdate({ ...args, flow: flow as SettingsFlow }, (flowWithError) => {
       setFlowContainer({
-        flow: newFlow,
+        flow: flowWithError,
         flowType: FlowType.Settings,
       });
 
@@ -31,16 +32,16 @@ function OidcSettings(props: OrySettingsOidcProps) {
 
   if (!flow) return null;
 
-  const hasWallet = !!(flow as SettingsFlow).identity.traits.wallet;
+  const hasWallet = isValidWalletAddress((flow as SettingsFlow).identity.traits.wallet);
 
   const handleLink = async () => {
     setOpen(true);
   };
 
   const handleUnlink = () => {
-    handleUnlinkWallet({ flow: flow as SettingsFlow }).then((newFlow) => {
+    handleUnlinkWallet({ flow: flow as SettingsFlow }, (flowWithError) => {
       setFlowContainer({
-        flow: newFlow,
+        flow: flowWithError,
         flowType: FlowType.Settings,
       });
     });
@@ -133,28 +134,9 @@ export default function SettingsUI({ flow, config }: Props) {
           "name" in node.attributes &&
           node.attributes.name === "traits.wallet"
         ) {
-          if (!node.attributes.value) {
-            return [];
-          }
-
-          return [
-            {
-              ...node,
-              attributes: {
-                ...node.attributes,
-                disabled: true,
-              },
-              meta: {
-                ...node.meta,
-                label: {
-                  ...node.meta?.label,
-                  id: node.meta?.label?.id ?? 0,
-                  type: node.meta?.label?.type ?? "info",
-                  text: "Wallet Address",
-                },
-              },
-            },
-          ];
+          return isValidWalletAddress(node.attributes.value)
+            ? [{ ...node, attributes: { ...node.attributes, disabled: true } }]
+            : [];
         }
 
         return [node];
