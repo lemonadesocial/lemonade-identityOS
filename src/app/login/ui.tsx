@@ -7,7 +7,11 @@ import { DefaultButtonSocial, Login } from "@ory/elements-react/theme";
 import { handleWalletLogin } from "../../client/ory";
 import { overridedComponents } from "../../client/ui";
 
-import { getFlowWithOidcNodesSorted } from "../../common/ory";
+import {
+  getFlowWithMutatedIndentifierInputNode,
+  getFlowWithOidcNodesSorted,
+  getFlowWithSomeInputsHidden,
+} from "../../common/ory";
 import { type PageProps } from "../../common/types";
 import CardWrapper from "../../components/card-wrapper";
 import FamilyWallet from "../../components/family-wallet";
@@ -43,7 +47,9 @@ interface Props extends PageProps {
   flow: LoginFlow;
 }
 export default function LoginUI({ flow, config }: Props) {
-  const updatedFlow = getFlowWithOidcNodesSorted(flow);
+  const updatedFlow = getFlowWithMutatedIndentifierInputNode(
+    getFlowWithOidcNodesSorted(getFlowWithSomeInputsHidden(flow)),
+  );
 
   return (
     <Web3Provider>

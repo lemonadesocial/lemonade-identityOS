@@ -52,8 +52,36 @@ export function getFlowWithSomeInputsHidden(flow: RegistrationFlow) {
         (node) =>
           !["traits.first_name", "traits.last_name", "traits.wallet"].includes(
             (node.attributes as UiNodeInputAttributes).name,
-          ),
+          ) && node.group !== "password",
       ),
+    },
+  } as RegistrationFlow;
+}
+
+export function getFlowWithMutatedIndentifierInputNode(flow: LoginFlow) {
+  return {
+    ...flow,
+    ui: {
+      ...flow.ui,
+      nodes: flow.ui.nodes.map((node) => {
+        if (
+          node.type === "input" &&
+          "name" in node.attributes &&
+          node.attributes.name === "identifier"
+        ) {
+          return {
+            ...node,
+            meta: {
+              ...node.meta,
+              label: {
+                ...node.meta.label,
+                id: 1070007, // <-- email
+              },
+            },
+          };
+        }
+        return node;
+      }),
     },
   } as RegistrationFlow;
 }
