@@ -9,7 +9,6 @@ import {
 } from "@ory/client-fetch";
 
 import { frontendApi } from "../common/ory";
-import { getDiscardedWalletAddress } from "../common/wallet";
 
 export function getCsrfToken(
   flow: LoginFlow | RegistrationFlow | SettingsFlow,
@@ -236,6 +235,8 @@ export async function handleUnlinkWallet(
   { flow }: { flow: SettingsFlow },
   onError?: (flow: SettingsFlow, err: unknown) => void,
 ) {
+  const { wallet, ...traits } = flow.identity.traits;
+
   frontendApi
     .updateSettingsFlow(
       {
@@ -243,10 +244,7 @@ export async function handleUnlinkWallet(
         updateSettingsFlowBody: {
           method: "profile",
           csrf_token: getCsrfToken(flow as SettingsFlow),
-          traits: {
-            ...flow.identity.traits,
-            wallet: getDiscardedWalletAddress(flow.identity.traits.wallet),
-          },
+          traits,
         },
       },
       {

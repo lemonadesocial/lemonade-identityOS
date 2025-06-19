@@ -1,7 +1,5 @@
-import assert from "assert";
 import { NextRequest, NextResponse } from "next/server";
 
-import { isValidWalletAddress } from "../../../../common/wallet";
 import { verifySignerFromSignatureAndToken } from "../../../../server/wallet";
 
 function returnError(message: string) {
@@ -47,14 +45,13 @@ export async function POST(request: NextRequest) {
 
   const wallet = bodyRest.identity.traits.wallet?.toLowerCase();
   const email = bodyRest.identity.traits.email;
-  const isWalletValid = isValidWalletAddress(wallet);
 
-  if (!email && !isWalletValid) {
+  if (!email && !wallet) {
     return returnError("Either email or wallet is required");
   }
 
   if (
-    !isWalletValid ||
+    !wallet ||
     (wallet && wallet === bodyRest.identity.metadata_public?.verified_wallet?.toLowerCase())
   ) {
     return NextResponse.json(bodyRest);

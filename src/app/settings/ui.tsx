@@ -11,7 +11,6 @@ import { handleProfileUpdate, handleUnlinkWallet, handleWalletUpdate } from "../
 import { overridedComponents } from "../../client/ui";
 
 import { type PageProps } from "../../common/types";
-import { isValidWalletAddress } from "../../common/wallet";
 import { useWalletPopup, Web3Provider } from "../../components/family-wallet/web3-provider";
 import Page from "../../components/page";
 
@@ -22,9 +21,7 @@ const getFlowNodes = (flow: SettingsFlow) => {
       "name" in node.attributes &&
       node.attributes.name === "traits.wallet"
     ) {
-      return isValidWalletAddress(node.attributes.value)
-        ? [{ ...node, attributes: { ...node.attributes, disabled: true } }]
-        : [];
+      return [{ ...node, attributes: { ...node.attributes, disabled: true } }];
     }
 
     //-- we don't allow user to update password because it will cause wallet login to fail
@@ -69,7 +66,7 @@ function OidcSettings(props: OrySettingsOidcProps) {
     });
   });
 
-  const hasWallet = isValidWalletAddress((flow as SettingsFlow).identity.traits.wallet);
+  const hasWallet = !!(flow as SettingsFlow).identity.traits.wallet;
 
   const handleLink = async () => {
     setOpen(true);
@@ -209,6 +206,10 @@ function SettingsSection(props: any) {
             //-- remove the email field if it is empty so Kratos won't complain
             if (data.traits.email === "") {
               delete data.traits.email;
+            }
+
+            if (data.traits.wallet === "") {
+              delete data.traits.wallet;
             }
 
             handleProfileUpdate(
