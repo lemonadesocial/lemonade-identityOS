@@ -41,7 +41,7 @@ jobs:
         run: |
           echo "NEXT_PUBLIC_ORY_SDK_URL=${{ vars.STAGING_NEXT_PUBLIC_ORY_SDK_URL }}" >> .env
           echo "NEXT_PUBLIC_COOKIE_DOMAIN=${{ vars.STAGING_NEXT_PUBLIC_COOKIE_DOMAIN }}" >> .env
-          echo "HYDRA_ADMIN_URL=${{ secrets.STAGING_HYDRA_ADMIN_URL }}" >> .env
+          echo "NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID=${{ vars.STAGING_NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID }}" >> .env
 
       - name: Configure environment
         run: |
