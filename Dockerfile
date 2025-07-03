@@ -11,7 +11,7 @@ WORKDIR /app
 
 RUN apk add --no-cache git
 COPY --from=manifest /tmp/package.json /tmp/yarn.lock ./
-RUN yarn install --frozen-lockfile --ignore-optional --production && \
+RUN yarn install --frozen-lockfile --ignore-optional && \
     rm -rf /usr/local/share/.cache/yarn
 
 ### build
