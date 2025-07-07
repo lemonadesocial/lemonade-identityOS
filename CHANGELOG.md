@@ -1,0 +1,55 @@
+# Changelog
+
+## 1.0.0 (2025-07-07)
+
+
+### Features
+
+* add family wallet connect button ([adb56c3](https://github.com/lemonadesocial/lemonade-identityOS/commit/adb56c36b61bb9b80f4916ba39a8a0b89f569d1c))
+* add wallet page to handle login/signup with wallet ([3b6262a](https://github.com/lemonadesocial/lemonade-identityOS/commit/3b6262aacf9fdcae0974585b4f2a0a24f1b0b493))
+* allow cors for wallet API ([a646e34](https://github.com/lemonadesocial/lemonade-identityOS/commit/a646e3450787d10cab768e34e8f29e52bbdcc4ab))
+* **build:** add build scripts ([00ff570](https://github.com/lemonadesocial/lemonade-identityOS/commit/00ff570f0806031c6bccf525dfa4e5a81f72ddcb))
+* **consent:** add consent page and refactor UI ([1ec91f8](https://github.com/lemonadesocial/lemonade-identityOS/commit/1ec91f89b7e251db09448ff7c12dccfb59b114ac))
+* **git:** add workflows ([fbac559](https://github.com/lemonadesocial/lemonade-identityOS/commit/fbac559c546f21879b0aa65b0d9b1df3bfffc11c))
+* handle flow error ([b4531f5](https://github.com/lemonadesocial/lemonade-identityOS/commit/b4531f5fff5e59d06a22b1544ec8f8d590ccfc2c))
+* handle login error without reload page ([395e4b8](https://github.com/lemonadesocial/lemonade-identityOS/commit/395e4b8bf0664d64a53fbf67baf389f52829757d))
+* handle registration flow error ([e8fd9b6](https://github.com/lemonadesocial/lemonade-identityOS/commit/e8fd9b6787bd436064a6d52449c37ad27c08689b))
+* handle registration with wallet ([48a20db](https://github.com/lemonadesocial/lemonade-identityOS/commit/48a20db26ff3ba73f1ec82516ce35b8eb1e6269b))
+* hide password reset in settings ([59ffeb6](https://github.com/lemonadesocial/lemonade-identityOS/commit/59ffeb60f61fe680e8738d3cc0d993582ed71ee9))
+* implement connect & signature request ([58f8c1d](https://github.com/lemonadesocial/lemonade-identityOS/commit/58f8c1df2329a72d88644e6c92bd62b6a5258f88))
+* implement login with wallet ([5d18823](https://github.com/lemonadesocial/lemonade-identityOS/commit/5d188234f40c4d3632ba4ef67824aa3237d85254))
+* link wallet in setting flow ([419d68f](https://github.com/lemonadesocial/lemonade-identityOS/commit/419d68f054a92eff5475fff6f57c3ac24fb5f7eb))
+* **logout:** fix logout flow link ([4573ef3](https://github.com/lemonadesocial/lemonade-identityOS/commit/4573ef3cc8fdc15bef64aca35db0ad7d2f25120f))
+* **pages:** add error page ([1216279](https://github.com/lemonadesocial/lemonade-identityOS/commit/121627935c0489d10b7d471c9b33728568beea97))
+* return better webhook error response ([d7710bc](https://github.com/lemonadesocial/lemonade-identityOS/commit/d7710bcefd688a35c6e420e792a6f7ade36f93be))
+* **ui:** implement basic UI for all flows ([030d715](https://github.com/lemonadesocial/lemonade-identityOS/commit/030d715c44384bb4d9de3c751b3ff163ebd755e2))
+* **ui:** improve overall UI ([5637a97](https://github.com/lemonadesocial/lemonade-identityOS/commit/5637a973079b2d00ed6a8d07ce1ecbc500985752))
+* **ui:** update recovery flow UI ([cd1131a](https://github.com/lemonadesocial/lemonade-identityOS/commit/cd1131aa3fbde1e91feb3dedda66350005fe0cfd))
+* **ui:** update settings UI ([f5309ec](https://github.com/lemonadesocial/lemonade-identityOS/commit/f5309ecf5724d45058aff52e18143fccc4f91fd3))
+* **ui:** update UI for login & signup ([7e7f7d6](https://github.com/lemonadesocial/lemonade-identityOS/commit/7e7f7d643188b93ce3091d3720757fc5ab45b957))
+* unlink wallet in settings ([b7ca909](https://github.com/lemonadesocial/lemonade-identityOS/commit/b7ca90984d845b0f585ff53fea731783a5b003c0))
+* update wallet also update password ([3c30c3b](https://github.com/lemonadesocial/lemonade-identityOS/commit/3c30c3b28d29cfe5e2992a3bcfc8fe92cc04e816))
+* update workflow secrets ([abee7d0](https://github.com/lemonadesocial/lemonade-identityOS/commit/abee7d0f91ad3338353c137f727ea2f701eb5fc5))
+
+
+### Bug Fixes
+
+* add login custom form root ([cdd6d08](https://github.com/lemonadesocial/lemonade-identityOS/commit/cdd6d0805aac9ba9a04e10036a0823f0094dffb6))
+* **build:** fix build issue ([a318172](https://github.com/lemonadesocial/lemonade-identityOS/commit/a318172580969082fd1574a466b94c5aa1d5d1a2))
+* **config:** fix cookie domain conflict ([f95010d](https://github.com/lemonadesocial/lemonade-identityOS/commit/f95010d27e6c6e602efa9b9bca49215d14d7c282))
+* **consent:** fix consent API call ([676ec03](https://github.com/lemonadesocial/lemonade-identityOS/commit/676ec031dcfc87c35cf46c9d626939cf23bfe886))
+* disconnect wallet after success signature ([ffa97e5](https://github.com/lemonadesocial/lemonade-identityOS/commit/ffa97e521efb89359eb5cd73f9ac3ea1f30854e4))
+* fix build issue ([2cb67e9](https://github.com/lemonadesocial/lemonade-identityOS/commit/2cb67e946451446d8680cf2eb5841057ad9bdf73))
+* fix login email input title ([d34163e](https://github.com/lemonadesocial/lemonade-identityOS/commit/d34163eead687bab27d1fd346d730b6c02734a40))
+* fix registration with code also submit wallet ([cccdc4f](https://github.com/lemonadesocial/lemonade-identityOS/commit/cccdc4fa17be9c9b584d9f462f3d773c435c3244))
+* fix setting flow showing error ([9940f96](https://github.com/lemonadesocial/lemonade-identityOS/commit/9940f96c5ea9630b005d37605a06896dadc0a0f7))
+* fix signature check ([0a2bff2](https://github.com/lemonadesocial/lemonade-identityOS/commit/0a2bff2039d889d28101bbd449aff704a99f6ee0))
+* fix unlink wallet ([e232026](https://github.com/lemonadesocial/lemonade-identityOS/commit/e2320262c2313ed2f20670bcac5896e57d5274d7))
+* fix unlink wallet ([758e71d](https://github.com/lemonadesocial/lemonade-identityOS/commit/758e71d64e4ed83460fc261c1c1a874d18bf877f))
+* fix update profile stucked when wallet is connected ([ebcc96c](https://github.com/lemonadesocial/lemonade-identityOS/commit/ebcc96c0bd00c4959d8b644e46235b33fdfbf130))
+* fix update profile when there is no email ([ad6800e](https://github.com/lemonadesocial/lemonade-identityOS/commit/ad6800ea32fa6a3b1c3aa7d1b5ab93fbe54ebe48))
+* fix verification not redirect ([831308c](https://github.com/lemonadesocial/lemonade-identityOS/commit/831308c51feb8afd160a506a9341d7fe955cf268))
+* fix web3 config ([f19fd9f](https://github.com/lemonadesocial/lemonade-identityOS/commit/f19fd9fb60f146929fa41dbfc09beb585d674137))
+* improve wallet unlink ([083c46d](https://github.com/lemonadesocial/lemonade-identityOS/commit/083c46db3b7333d58cbbfb57d9b13128357f1af8))
+* improve webhook messages ([6094902](https://github.com/lemonadesocial/lemonade-identityOS/commit/60949026005a9445551b8d824ccea4457432ae3f))
+* not sign if wallet is connected ([1b64155](https://github.com/lemonadesocial/lemonade-identityOS/commit/1b6415592991a028e674275fec9d88978ca1c4b6))
