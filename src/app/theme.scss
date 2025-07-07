@@ -36,6 +36,8 @@
   --interface-background-default-primary: var(--background-primary);
   --interface-background-default-secondary: var(--background-secondary);
   --interface-background-default-primary-hover: var(--background-secondary);
+  --input-background-disabled: var(--background-secondary);
+  --input-border-disabled: transparent;
 }
 
 /* Dark mode theme */
@@ -88,4 +90,22 @@
   input:hover {
     background-color: var(--black);
   }
+}
+
+.card-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 21px;
+  padding: 35px;
+  max-width: 400px;
+  margin: auto;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  background-color: #000000;
+  border-radius: 21px;
+}
+
+.bg-button-social-background-generic-provider {
+  min-width: 32px;
 }
