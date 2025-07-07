@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { sign, verify } from "../utils/jwt";
 
-import { getRedis } from "./redis";
+// import { getRedis } from "./redis";
 
 export const getWalletMessageWithToken = async (wallet: string) => {
   const jwtSecret = process.env.JWT_SECRET;
@@ -38,8 +38,8 @@ export const verifySignerFromSignatureAndToken = async (signature: string, token
 
   assert.strictEqual(signer, wallet.toLowerCase(), "invalid signature");
 
-  const replayed = await getRedis().set(`signature:${nonce}`, 1, "EXAT", exp, "GET");
-  assert.strictEqual(replayed, null, "signature replayed");
+  // const replayed = await getRedis().set(`signature:${nonce}`, 1, "EXAT", exp, "GET");
+  // assert.strictEqual(replayed, null, "signature replayed");
 
   return signer;
 };

@@ -35,6 +35,9 @@ jobs:
 
       - name: Generate .env file from GitHub variables
         run: |
+          echo "REDIS_URL=${{ secrets.PRODUCTION_REDIS_URL }}" >> .env
+          echo "KRATOS_ADMIN_URL=${{ secrets.PRODUCTION_HYDRA_ADMIN_URL }}" >> .env
+          echo "JWT_SECRET=${{ secrets.PRODUCTION_JWT_SECRET }}" >> .env
           echo "NEXT_PUBLIC_ORY_SDK_URL=${{ vars.PRODUCTION_NEXT_PUBLIC_ORY_SDK_URL }}" >> .env
           echo "NEXT_PUBLIC_COOKIE_DOMAIN=${{ vars.PRODUCTION_NEXT_PUBLIC_COOKIE_DOMAIN }}" >> .env
           echo "NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID=${{ vars.PRODUCTION_NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID }}" >> .env
