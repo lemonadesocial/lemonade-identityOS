@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.0](https://github.com/lemonadesocial/lemonade-identityOS/compare/v1.0.0...v1.1.0) (2025-07-08)
+
+
+### Features
+
+* rename env ([8f35a2e](https://github.com/lemonadesocial/lemonade-identityOS/commit/8f35a2e0802b9617794a886fa370405124e898fd))
+
+
+### Bug Fixes
+
+* **wallet:** use lowercase wallet address ([cc1af73](https://github.com/lemonadesocial/lemonade-identityOS/commit/cc1af739bf0bcc0551931e6f8a3fdb63cad694da))
+
 ## 1.0.0 (2025-07-07)
 
 
