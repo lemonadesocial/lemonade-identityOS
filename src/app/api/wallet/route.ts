@@ -3,8 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { getWalletMessageWithToken } from "../../../server/wallet";
 
-
-function addCorsHeaders(response: NextResponse, origin: string | null): NextResponse {
+function addCorsHeaders(response: NextResponse): NextResponse {
   response.headers.set("Access-Control-Allow-Origin", "*");
 
   response.headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
@@ -31,10 +30,10 @@ export async function GET(request: NextRequest) {
   const response = await getWalletMessageWithToken(wallet);
   const nextResponse = NextResponse.json(response);
 
-  return addCorsHeaders(nextResponse, request.headers.get("origin"));
+  return addCorsHeaders(nextResponse);
 }
 
 export async function OPTIONS(request: NextRequest) {
   const response = new NextResponse(null, { status: 200 });
-  return addCorsHeaders(response, request.headers.get("origin"));
+  return addCorsHeaders(response);
 }

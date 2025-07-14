@@ -10,7 +10,7 @@ import {
 
 export const oauthApi = new OAuth2Api(
   new Configuration({
-    basePath: process.env.KRATOS_ADMIN_URL,
+    basePath: process.env.HYDRA_ADMIN_URL,
   }),
 );
 
