@@ -14,8 +14,6 @@ export default async function ConsentPage(props: OryPageParams) {
 
   const consentRequest = await oauthApi.getOAuth2ConsentRequest({ consentChallenge });
 
-  const user = (session.identity?.metadata_public as Record<string, string>).user;
-
   const acceptResponse = await oauthApi.acceptOAuth2ConsentRequest({
     consentChallenge,
     acceptOAuth2ConsentRequest: {
@@ -24,11 +22,9 @@ export default async function ConsentPage(props: OryPageParams) {
       session: {
         access_token: {
           session: session.id,
-          user,
         },
         id_token: {
           session: session.id,
-          user,
         },
       },
     },
