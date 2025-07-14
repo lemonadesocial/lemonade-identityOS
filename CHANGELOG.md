@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/lemonadesocial/lemonade-identityOS/compare/v1.1.0...v1.1.1) (2025-07-14)
+
+
+### Bug Fixes
+
+* **oauth2:** fix config oauth2 base path ([44a4981](https://github.com/lemonadesocial/lemonade-identityOS/commit/44a4981484ed837a1a6b64d5648fed3928e818bf))
+
 ## [1.1.0](https://github.com/lemonadesocial/lemonade-identityOS/compare/v1.0.0...v1.1.0) (2025-07-08)
 
 
