@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://github.com/lemonadesocial/lemonade-identityOS/compare/v1.2.0...v1.2.1) (2025-07-14)
+
+
+### Bug Fixes
+
+* **consent:** remove user id in oauth2 token ([a78502e](https://github.com/lemonadesocial/lemonade-identityOS/commit/a78502e724c80d2c58ae7ef2b9a0976f2e49801c))
+
 ## [1.2.0](https://github.com/lemonadesocial/lemonade-identityOS/compare/v1.1.1...v1.2.0) (2025-07-14)
 
 
