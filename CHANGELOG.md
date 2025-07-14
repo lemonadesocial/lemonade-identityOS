@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/lemonadesocial/lemonade-identityOS/compare/v1.1.1...v1.2.0) (2025-07-14)
+
+
+### Features
+
+* **logout:** add logout page ([fd4506a](https://github.com/lemonadesocial/lemonade-identityOS/commit/fd4506ade03bf6bf1b09f10b7a8788af1a1762da))
+
 ## [1.1.1](https://github.com/lemonadesocial/lemonade-identityOS/compare/v1.1.0...v1.1.1) (2025-07-14)
 
 
