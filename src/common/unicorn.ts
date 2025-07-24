@@ -13,3 +13,8 @@ export interface AuthCookie {
 export const decodeAuthCookie = (authCookie: string) => {
   return jwt.decode(authCookie) as AuthCookie;
 };
+
+export const verifyAuthCookie = (authCookie: string) => {
+  //-- TODO: find a way to actually verify the auth cookie
+  return decodeAuthCookie(authCookie);
+};

@@ -1,13 +1,12 @@
 import { LoginFlow, RegistrationFlow, SettingsFlow } from "@ory/client-fetch";
 
 import {
+  dummyWalletPassword,
   handlePasswordLogin,
   handlePasswordRegistration,
   handleRemoveTraits,
   handleUpdateFlowProfile,
 } from "./ory";
-
-export const dummyWalletPassword = "dummy-wallet-password";
 
 export async function handleWalletRegistration(
   {

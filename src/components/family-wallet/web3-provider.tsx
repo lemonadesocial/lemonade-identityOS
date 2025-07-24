@@ -72,10 +72,6 @@ export const useWalletPopup = (
   const [signature, setSignature] = useState("");
   const [token, setToken] = useState("");
 
-  useEffect(() => {
-    console.log("Acc changed:", account);
-  }, [account]);
-
   const sign = async () => {
     if (!account.address) {
       return;
