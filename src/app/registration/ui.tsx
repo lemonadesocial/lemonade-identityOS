@@ -5,8 +5,9 @@ import { OryNodeOidcButtonProps, useOryFlow } from "@ory/elements-react";
 import { DefaultButtonSocial, DefaultFormContainer, Registration } from "@ory/elements-react/theme";
 import { useEffect } from "react";
 
-import { handleWalletRegistration } from "../../client/wallet";
 import { overridedComponents } from "../../client/ui";
+import { handleUnicornRegistration } from "../../client/unicorn";
+import { handleWalletRegistration } from "../../client/wallet";
 
 import { getFlowWithOidcNodesSorted, getFlowWithSomeInputsHidden } from "../../common/ory";
 import { PageProps } from "../../common/types";
@@ -23,6 +24,7 @@ function OidcButton(props: OryNodeOidcButtonProps) {
   if (value === "family_wallet") {
     return (
       <FamilyWallet
+        unicornCookieHandler={handleUnicornRegistration}
         flow={flow as RegistrationFlow}
         onLogin={(args, disconnect) => {
           disconnect();

@@ -1,49 +1,67 @@
 import { useEffect, useState } from "react";
-import { LoginFlow } from "@ory/client-fetch";
+import { LoginFlow, RegistrationFlow } from "@ory/client-fetch";
 
 import { decodeAuthCookie } from "../common/unicorn";
-import { frontendApi } from "../common/ory";
 
 import { dummyWalletPassword, handlePasswordLogin, handlePasswordRegistration } from "./ory";
 
-const handleAuthCookie = async (loginFlow: LoginFlow, wallet: string, cookie: string) => {
-  const lowerCaseWallet = wallet.toLowerCase();
-
-  //-- try login first because login is used more
+export const handleUnicornLogin = async (flow: LoginFlow, wallet: string, cookie: string) => {
   handlePasswordLogin(
     {
-      flow: loginFlow,
+      flow,
       payload: {
-        identifier: lowerCaseWallet,
+        identifier: wallet.toLowerCase(),
         password: dummyWalletPassword,
         transient_payload: {
           unicorn_auth_cookie: cookie,
         },
       },
     },
-    (errLoginFlow) => {
-      console.log("errLoginFlow", errLoginFlow);
+    () => {
+      const requestUrl = new URL(flow.request_url);
 
-      //-- try register
-      frontendApi.createBrowserRegistrationFlow().then((flow) => {
-        handlePasswordRegistration({
-          flow,
-          payload: {
-            password: dummyWalletPassword,
-            traits: {
-              unicorn_wallet: lowerCaseWallet,
-            },
-            transient_payload: {
-              unicorn_auth_cookie: cookie,
-            },
-          },
-        });
+      const url = new URL(`${window.location.origin}/registration`);
+
+      //-- copy all params from the request url to the new url
+      requestUrl.searchParams.forEach((value, key) => {
+        url.searchParams.set(key, value);
       });
+
+      window.location.href = url.toString();
     },
   );
 };
 
-export const useUnicornLoginHandle = (flow: LoginFlow) => {
+export const handleUnicornRegistration = async (
+  flow: RegistrationFlow,
+  wallet: string,
+  cookie: string,
+) => {
+  //-- try login first because login is used more
+  handlePasswordRegistration(
+    {
+      flow,
+      payload: {
+        password: dummyWalletPassword,
+        traits: {
+          unicorn_wallet: wallet.toLowerCase(),
+        },
+        transient_payload: {
+          unicorn_auth_cookie: cookie,
+        },
+      },
+    },
+    (flow) => {
+      alert("Failed to register using Unicorn wallet");
+      console.log(flow);
+    },
+  );
+};
+
+export const useUnicornHandle = <T extends LoginFlow | RegistrationFlow>(
+  flow: T,
+  unicornCookieHandler: (flow: T, wallet: string, cookie: string) => Promise<void>,
+) => {
   const [processing, setProcessing] = useState(false);
 
   const processAuthCookie = async (cookie: string) => {
@@ -59,7 +77,7 @@ export const useUnicornLoginHandle = (flow: LoginFlow) => {
 
     try {
       setProcessing(true);
-      await handleAuthCookie(flow, walletAddress, cookie);
+      await unicornCookieHandler(flow, walletAddress, cookie);
     } finally {
       setProcessing(false);
     }
