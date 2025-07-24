@@ -5,7 +5,10 @@ import {
   SuccessfulNativeLogin,
   SuccessfulNativeRegistration,
   UiNodeInputAttributes,
+  UpdateLoginFlowWithPasswordMethod,
+  UpdateRegistrationFlowWithPasswordMethod,
   UpdateSettingsFlowBody,
+  UpdateSettingsFlowWithProfileMethod,
 } from "@ory/client-fetch";
 
 import { frontendApi } from "../common/ory";
@@ -40,35 +43,25 @@ export function handleFlowSuccess(success: SuccessfulNativeRegistration | Succes
   }
 }
 
-//-- this password is not used to login, so it does not need to be secure
-//-- the only requirement is that it needs to be more than 8 characters
-//-- the address here is already lowercased
-function getPassword(address: string) {
-  return address.split("").reverse().join("");
-}
-
 async function parseError(err: any) {
   const data = Buffer.from(await err.response.arrayBuffer());
   const errorJson = JSON.parse(data.toString("utf-8"));
   return errorJson;
 }
 
-export async function handleWalletRegistration(
+export async function handlePasswordRegistration(
   {
     flow,
-    signature,
-    address,
-    token,
+    payload,
   }: {
     flow: RegistrationFlow;
-    signature: string;
-    address: string;
-    token: string;
+    payload: Pick<
+      UpdateRegistrationFlowWithPasswordMethod,
+      "traits" | "password" | "transient_payload"
+    >;
   },
   onError?: (flow: RegistrationFlow, err: unknown) => void,
 ) {
-  const lowerCaseAddress = address.toLowerCase();
-
   return frontendApi
     .updateRegistrationFlow(
       {
@@ -76,14 +69,7 @@ export async function handleWalletRegistration(
         updateRegistrationFlowBody: {
           method: "password",
           csrf_token: getCsrfToken(flow),
-          password: getPassword(lowerCaseAddress),
-          traits: {
-            wallet: lowerCaseAddress,
-          },
-          transient_payload: {
-            wallet_signature: signature,
-            wallet_signature_token: token,
-          },
+          ...payload,
         },
       },
       { credentials: "include" },
@@ -98,22 +84,19 @@ export async function handleWalletRegistration(
     });
 }
 
-export async function handleWalletLogin(
+export async function handlePasswordLogin(
   {
     flow,
-    signature,
-    address,
-    token,
+    payload,
   }: {
     flow: LoginFlow;
-    signature: string;
-    address: string;
-    token: string;
+    payload: Pick<
+      UpdateLoginFlowWithPasswordMethod,
+      "identifier" | "password" | "transient_payload"
+    >;
   },
   onError?: (flow: LoginFlow, err: unknown) => void,
 ) {
-  const lowerCaseAddress = address.toLowerCase();
-
   return frontendApi
     .updateLoginFlow(
       {
@@ -121,12 +104,7 @@ export async function handleWalletLogin(
         updateLoginFlowBody: {
           method: "password",
           csrf_token: getCsrfToken(flow),
-          password: getPassword(lowerCaseAddress),
-          identifier: lowerCaseAddress,
-          transient_payload: {
-            wallet_signature: signature,
-            wallet_signature_token: token,
-          },
+          ...payload,
         },
       },
       { credentials: "include" },
@@ -184,22 +162,16 @@ export async function handleProfileUpdate(
     .catch((err) => handleSettingsFlowError(flow, err, onError));
 }
 
-export async function handleWalletUpdate(
+export async function handleUpdateFlowProfile(
   {
     flow,
-    signature,
-    address,
-    token,
+    payload,
   }: {
     flow: SettingsFlow;
-    signature: string;
-    address: string;
-    token: string;
+    payload: Pick<UpdateSettingsFlowWithProfileMethod, "traits" | "transient_payload">;
   },
   onError?: (flow: SettingsFlow, err: unknown) => void,
 ) {
-  const lowerCaseAddress = address.toLowerCase();
-
   return frontendApi
     .updateSettingsFlow(
       {
@@ -208,41 +180,22 @@ export async function handleWalletUpdate(
         updateSettingsFlowBody: {
           method: "profile",
           csrf_token: getCsrfToken(flow),
-          traits: {
-            ...flow.identity.traits,
-            wallet: lowerCaseAddress,
-          },
-          transient_payload: {
-            wallet_signature: signature,
-            wallet_signature_token: token,
-          },
+          ...payload,
         },
       },
       { credentials: "include" },
-    )
-    .then((flow) =>
-      //-- then we need to update the dummy password for this wallet address
-      frontendApi.updateSettingsFlow(
-        {
-          flow: flow.id,
-          updateSettingsFlowBody: {
-            method: "password",
-            password: getPassword(lowerCaseAddress),
-            csrf_token: getCsrfToken(flow),
-          },
-        },
-        { credentials: "include" },
-      ),
     )
     .then((flow) => handleFlowSuccess(flow as SettingsFlow))
     .catch((err) => handleSettingsFlowError(flow, err, onError));
 }
 
-export async function handleUnlinkWallet(
-  { flow }: { flow: SettingsFlow },
+export async function handleRemoveTraits(
+  { flow, traits }: { flow: SettingsFlow; traits: string[] },
   onError?: (flow: SettingsFlow, err: unknown) => void,
 ) {
-  const { wallet, ...traits } = flow.identity.traits;
+  const newTraits = Object.fromEntries(
+    Object.entries(flow.identity.traits).filter(([key]) => !traits.includes(key)),
+  );
 
   frontendApi
     .updateSettingsFlow(
@@ -251,7 +204,7 @@ export async function handleUnlinkWallet(
         updateSettingsFlowBody: {
           method: "profile",
           csrf_token: getCsrfToken(flow as SettingsFlow),
-          traits,
+          traits: newTraits,
         },
       },
       {

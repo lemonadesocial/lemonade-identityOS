@@ -37,13 +37,6 @@ const unicornConnector = inAppWalletConnector({
   },
   metadata: {
     name: "Unicorn.eth",
-    icon: "/unicorn.png",
-    image: {
-      src: "/unicorn.png",
-      alt: "Unicorn.eth",
-      height: 100,
-      width: 100,
-    },
   },
 });
 

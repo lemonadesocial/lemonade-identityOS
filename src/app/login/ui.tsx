@@ -5,8 +5,8 @@ import { OryNodeOidcButtonProps, useOryFlow } from "@ory/elements-react";
 import { DefaultButtonSocial, DefaultFormContainer, Login } from "@ory/elements-react/theme";
 import { useEffect } from "react";
 
-import { handleWalletLogin } from "../../client/ory";
 import { overridedComponents } from "../../client/ui";
+import { handleWalletLogin } from "../../client/wallet";
 
 import {
   getFlowWithMutatedIndentifierInputNode,
@@ -27,6 +27,7 @@ function OidcButton(props: OryNodeOidcButtonProps) {
   if (value === "family_wallet") {
     return (
       <FamilyWallet
+        flow={flow as LoginFlow}
         onLogin={(args, disconnect) => {
           disconnect();
 
