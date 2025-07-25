@@ -1,20 +1,8 @@
 import assert from "assert";
 import { NextRequest, NextResponse } from "next/server";
 
+import { addCorsHeaders } from "../../../server/request";
 import { getWalletMessageWithToken } from "../../../server/wallet";
-
-function addCorsHeaders(response: NextResponse): NextResponse {
-  response.headers.set("Access-Control-Allow-Origin", "*");
-
-  response.headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-
-  response.headers.set(
-    "Access-Control-Allow-Headers",
-    "Content-Type, Authorization, X-Requested-With",
-  );
-
-  return response;
-}
 
 export async function GET(request: NextRequest) {
   const jwtSecret = process.env.JWT_SECRET;

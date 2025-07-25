@@ -1,5 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 
+export function addCorsHeaders(response: NextResponse): NextResponse {
+  response.headers.set("Access-Control-Allow-Origin", "*");
+
+  response.headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+
+  response.headers.set(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Authorization, X-Requested-With",
+  );
+
+  return response;
+}
+
 export const parseRequest = async (request: NextRequest) => {
   const payload: {
     identity: {

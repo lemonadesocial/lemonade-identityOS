@@ -1,11 +1,17 @@
-import { useEffect, useState } from "react";
 import { LoginFlow, RegistrationFlow } from "@ory/client-fetch";
+import assert from "assert";
+import { useEffect, useState } from "react";
 
 import { decodeAuthCookie } from "../common/unicorn";
 
+import { getUnicornCanLink, linkUnicornWallet } from "./api";
 import { dummyWalletPassword, handlePasswordLogin, handlePasswordRegistration } from "./ory";
 
-export const handleUnicornLogin = async (flow: LoginFlow, wallet: string, cookie: string) => {
+async function prompt(message: string) {
+  return window.confirm(message);
+}
+
+const handleLogin = (flow: LoginFlow, wallet: string, cookie: string) => {
   handlePasswordLogin(
     {
       flow,
@@ -30,6 +36,29 @@ export const handleUnicornLogin = async (flow: LoginFlow, wallet: string, cookie
       window.location.href = url.toString();
     },
   );
+};
+
+export const handleUnicornLogin = async (flow: LoginFlow, wallet: string, cookie: string) => {
+  //-- check if the wallet is linkable
+  const response = await getUnicornCanLink(cookie);
+
+  if (response.canLink) {
+    const identifier = response.email || response.wallet;
+
+    assert.ok(identifier, "No identifier is returned");
+
+    const accept = await prompt(
+      `Existing account found with the same credential ${identifier}. Do you want to link your Unicorn wallet to this account?`,
+    );
+
+    if (accept) {
+      //-- perform link
+      await linkUnicornWallet(identifier, cookie);
+    }
+  }
+
+  //-- perform login anyway
+  handleLogin(flow, wallet, cookie);
 };
 
 export const handleUnicornRegistration = async (
