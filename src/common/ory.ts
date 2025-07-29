@@ -8,6 +8,8 @@ import {
   UiNodeInputAttributes,
 } from "@ory/client-fetch";
 
+export const dummyWalletPassword = "!!dummy-WALLET-password@@";
+
 export const oauthApi = new OAuth2Api(
   new Configuration({
     basePath: process.env.HYDRA_ADMIN_URL,

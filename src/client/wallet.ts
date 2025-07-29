@@ -1,7 +1,7 @@
 import { LoginFlow, RegistrationFlow, SettingsFlow } from "@ory/client-fetch";
 
+import { dummyWalletPassword } from "../common/ory";
 import {
-  dummyWalletPassword,
   handlePasswordLogin,
   handlePasswordRegistration,
   handleRemoveTraits,

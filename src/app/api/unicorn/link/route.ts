@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { dummyWalletPassword } from "../../../../common/ory";
 import { verifyAuthCookie } from "../../../../common/unicorn";
+
 import { getUserByIdentifier, updateIdentity } from "../../../../server/ory";
 
 //-- check if the unicorn authCookie contains credential that can be used to link to existing account
@@ -56,7 +58,17 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    await updateIdentity(id, payload);
+    await updateIdentity(id, {
+      ...payload,
+      credentials: {
+        //-- the account may not have password set, we should reset it anyway
+        password: {
+          config: {
+            password: dummyWalletPassword,
+          }
+        }
+      }
+    });
   } else if (identifier === wallet) {
     //-- link wallet to existing wallet user
     //-- the email here is obviously not used for any account, because otherwise it would fall to the first case

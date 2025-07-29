@@ -4,8 +4,9 @@ import { useEffect, useState } from "react";
 
 import { decodeAuthCookie } from "../common/unicorn";
 
+import { dummyWalletPassword } from "../common/ory";
 import { getUnicornCanLink, linkUnicornWallet } from "./api";
-import { dummyWalletPassword, handlePasswordLogin, handlePasswordRegistration } from "./ory";
+import { handlePasswordLogin, handlePasswordRegistration } from "./ory";
 
 async function prompt(message: string) {
   return window.confirm(message);
@@ -115,7 +116,11 @@ export const useUnicornHandle = <T extends LoginFlow | RegistrationFlow>(
   useEffect(() => {
     const params = new URL(flow.request_url).searchParams;
 
-    const authCookie = params.get("authCookie");
+    let authCookie = params.get("authCookie");
+
+    if (!authCookie) {
+      authCookie = new URLSearchParams(window.location.search).get("authCookie");
+    }
 
     if (authCookie) {
       processAuthCookie(authCookie);

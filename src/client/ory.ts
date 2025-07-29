@@ -13,8 +13,6 @@ import {
 
 import { frontendApi } from "../common/ory";
 
-export const dummyWalletPassword = "!!dummy-WALLET-password@@";
-
 export function getCsrfToken(
   flow: LoginFlow | RegistrationFlow | SettingsFlow,
 ): string | undefined {
