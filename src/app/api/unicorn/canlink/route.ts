@@ -16,22 +16,19 @@ export async function GET(request: NextRequest) {
 
   //-- check email
   const email = storedToken.authDetails.email.toLocaleLowerCase();
-  const emailUser = await getUserByIdentifier(email);
-
-  if (emailUser && !emailUser.traits.unicorn_wallet) {
-    return NextResponse.json({ canLink: true, email });
-  }
-
-  //-- check wallet
   const wallet = storedToken.authDetails.walletAddress?.toLowerCase();
 
-  if (wallet) {
-    const walletUser = await getUserByIdentifier(wallet);
+  const [emailUser, walletUser] = await Promise.all([
+    getUserByIdentifier(email),
+    wallet && getUserByIdentifier(wallet),
+  ]);
 
-    if (walletUser && !walletUser.traits.unicorn_wallet) {
-      return NextResponse.json({ canLink: true, wallet });
-    }
-  }
+  const canLinkEmail = emailUser && !emailUser.traits.unicorn_wallet && !walletUser;
+  const canLinkWallet = !canLinkEmail && walletUser && !walletUser.traits.unicorn_wallet;
 
-  return NextResponse.json({ canLink: false });
+  return NextResponse.json({
+    canLink: canLinkEmail || canLinkWallet,
+    ...(canLinkEmail && { email }),
+    ...(canLinkWallet && { wallet }),
+  });
 }

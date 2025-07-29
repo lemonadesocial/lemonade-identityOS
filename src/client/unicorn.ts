@@ -25,9 +25,10 @@ const handleLogin = (flow: LoginFlow, wallet: string, cookie: string) => {
       },
     },
     () => {
+      //-- login failed, redirect to registration
       const requestUrl = new URL(flow.request_url);
 
-      const url = new URL(`${window.location.origin}/registration`);
+      const url = new URL(`${window.location.origin}/registration?return_to=${process.env.NEXT_PUBLIC_LEMONADE_APP_URL}`);
 
       //-- copy all params from the request url to the new url
       requestUrl.searchParams.forEach((value, key) => {
@@ -36,6 +37,7 @@ const handleLogin = (flow: LoginFlow, wallet: string, cookie: string) => {
 
       window.location.href = url.toString();
     },
+    process.env.NEXT_PUBLIC_LEMONADE_APP_URL
   );
 };
 
@@ -100,7 +102,7 @@ export const useUnicornHandle = <T extends LoginFlow | RegistrationFlow>(
     const walletAddress = authCookie.storedToken.authDetails.walletAddress;
 
     if (!walletAddress) {
-      alert("This account is not ready to use");
+      alert("This Unicorn wallet is not ready");
 
       return;
     }

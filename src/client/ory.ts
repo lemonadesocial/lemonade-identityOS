@@ -23,23 +23,35 @@ export function getCsrfToken(
   return (csrfNode as UiNodeInputAttributes)?.value;
 }
 
-export function handleFlowSuccess(success: SuccessfulNativeRegistration | SuccessfulNativeLogin) {
+export function handleFlowSuccess(
+  success: SuccessfulNativeRegistration | SuccessfulNativeLogin,
+  forceRedirect?: string,
+) {
   const verification = success.continue_with?.find(
     (action) => action.action === "show_verification_ui",
   );
-  const redirect = success.continue_with?.find((action) => action.action === "redirect_browser_to");
 
-  if (verification?.flow.url) {
-    //-- prioritize verification over redirect
-    const url = new URL(verification.flow.url);
+  let redirectUrl = forceRedirect;
 
-    if (!url.searchParams.has("return_to")) {
-      url.searchParams.set("return_to", window.location.href);
+  if (!redirectUrl) {
+    const redirect = success.continue_with?.find((action) => action.action === "redirect_browser_to");
+
+    if (verification?.flow.url) {
+      //-- prioritize verification over redirect
+      const url = new URL(verification.flow.url);
+
+      if (!url.searchParams.has("return_to")) {
+        url.searchParams.set("return_to", window.location.href);
+      }
+
+      redirectUrl = url.toString();
+    } else if (redirect) {
+      redirectUrl = redirect.redirect_browser_to;
     }
+  }
 
-    window.location.href = url.toString();
-  } else if (redirect) {
-    window.location.href = redirect.redirect_browser_to;
+  if (redirectUrl) {
+    window.location.href = redirectUrl;
   }
 }
 
@@ -96,6 +108,7 @@ export async function handlePasswordLogin(
     >;
   },
   onError?: (flow: LoginFlow, err: unknown) => void,
+  forceRedirect?: string,
 ) {
   return frontendApi
     .updateLoginFlow(
@@ -110,7 +123,7 @@ export async function handlePasswordLogin(
       { credentials: "include" },
     )
     .then((login) => {
-      handleFlowSuccess(login);
+      handleFlowSuccess(login, forceRedirect);
     })
     .catch((err) => {
       frontendApi
