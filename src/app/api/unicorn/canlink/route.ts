@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { verifyAuthCookie } from "../../../../common/unicorn";
 import { getUserByIdentifier } from "../../../../server/ory";
+import { addCorsHeaders } from "../../../../server/request";
 
-//-- check if the unicorn authCookie contains credential that can be used to link to existing account
-export async function GET(request: NextRequest) {
+async function processGet(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const cookie = searchParams.get("auth_cookie");
 
@@ -37,4 +37,15 @@ export async function GET(request: NextRequest) {
     ...(canLinkEmail && { email }),
     ...(canLinkWallet && { wallet }),
   });
+}
+
+//-- check if the unicorn authCookie contains credential that can be used to link to existing account
+export async function GET(request: NextRequest) {
+  const response = await processGet(request);
+  return addCorsHeaders(response);
+}
+
+export async function OPTIONS() {
+  const response = new NextResponse(null, { status: 200 });
+  return addCorsHeaders(response);
 }

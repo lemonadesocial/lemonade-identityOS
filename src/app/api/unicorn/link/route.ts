@@ -4,9 +4,10 @@ import { dummyWalletPassword } from "../../../../common/ory";
 import { verifyAuthCookie } from "../../../../common/unicorn";
 
 import { getUserByIdentifier, updateIdentity } from "../../../../server/ory";
+import { addCorsHeaders } from "../../../../server/request";
 
 //-- check if the unicorn authCookie contains credential that can be used to link to existing account
-export async function POST(request: NextRequest) {
+async function processPost(request: NextRequest) {
   const body = await request.json();
 
   const identifier: string | undefined = body.identifier;
@@ -100,4 +101,14 @@ export async function POST(request: NextRequest) {
   }
 
   return NextResponse.json({}, { status: 200 });
+}
+
+export async function POST(request: NextRequest) {
+  const response = await processPost(request);
+  return addCorsHeaders(response);
+}
+
+export async function OPTIONS() {
+  const response = new NextResponse(null, { status: 200 });
+  return addCorsHeaders(response);
 }
