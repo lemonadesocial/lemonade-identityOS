@@ -39,7 +39,11 @@ export async function POST(request: NextRequest) {
       return returnError("Missing required transient payload");
     }
 
-    const authCookie = verifyAuthCookie(transient_payload.unicorn_auth_cookie);
+    const authCookie = await verifyAuthCookie(transient_payload.unicorn_auth_cookie);
+
+    if (!authCookie) {
+      return returnError("Invalid auth cookie");
+    }
 
     if (authCookie.storedToken.authDetails.walletAddress?.toLowerCase() !== unicorn_wallet) {
       return returnError("Wallet address mismatch");

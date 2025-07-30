@@ -6,13 +6,19 @@ import { getUserByIdentifier } from "../../../../server/ory";
 //-- check if the unicorn authCookie contains credential that can be used to link to existing account
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const authCookie = searchParams.get("auth_cookie");
+  const cookie = searchParams.get("auth_cookie");
 
-  if (!authCookie) {
+  if (!cookie) {
     return new NextResponse("Auth cookie is required", { status: 400 });
   }
 
-  const { storedToken } = verifyAuthCookie(authCookie);
+  const authCookie = await verifyAuthCookie(cookie);
+
+  if (!authCookie) {
+    return new NextResponse("Invalid auth cookie", { status: 400 });
+  }
+
+  const { storedToken } = authCookie;
 
   //-- check email
   const email = storedToken.authDetails.email.toLocaleLowerCase();

@@ -10,13 +10,18 @@ export async function POST(request: NextRequest) {
   const body = await request.json();
 
   const identifier: string | undefined = body.identifier;
-  const auth_cookie: string | undefined = body.auth_cookie;
+  const cookie: string | undefined = body.auth_cookie;
 
-  if (!identifier || !auth_cookie) {
+  if (!identifier || !cookie) {
     return new NextResponse("Invalid request", { status: 400 });
   }
 
-  const { storedToken } = verifyAuthCookie(auth_cookie);
+  const authCookie = await verifyAuthCookie(cookie);
+
+  if (!authCookie) {
+    return new NextResponse("Invalid auth cookie", { status: 400 });
+  }
+  const { storedToken } = authCookie;
 
   const email = storedToken.authDetails.email.toLowerCase();
   const wallet = storedToken.authDetails.walletAddress?.toLowerCase();
@@ -65,9 +70,9 @@ export async function POST(request: NextRequest) {
         password: {
           config: {
             password: dummyWalletPassword,
-          }
-        }
-      }
+          },
+        },
+      },
     });
   } else if (identifier === wallet) {
     //-- link wallet to existing wallet user
