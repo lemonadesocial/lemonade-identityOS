@@ -26,13 +26,14 @@ async function processGet(request: NextRequest) {
 
   const [emailUser, walletUser] = await Promise.all([
     getUserByIdentifier(email),
-    wallet && getUserByIdentifier(wallet),
+    wallet ? getUserByIdentifier(wallet) : undefined,
   ]);
 
   const canLinkEmail = emailUser && !emailUser.traits.unicorn_wallet && !walletUser;
   const canLinkWallet = !canLinkEmail && walletUser && !walletUser.traits.unicorn_wallet;
 
   return NextResponse.json({
+    identityId: walletUser?.id,
     canLink: canLinkEmail || canLinkWallet,
     ...(canLinkEmail && { email }),
     ...(canLinkWallet && { wallet }),
