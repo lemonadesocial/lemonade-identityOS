@@ -1153,6 +1153,14 @@
     ethereum-cryptography "^2.0.0"
     micro-ftch "^0.3.1"
 
+"@farcaster/quick-auth@^0.0.7":
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/@farcaster/quick-auth/-/quick-auth-0.0.7.tgz#30de6a17a45cdc2cd28cb9274eb6a18195b04400"
+  integrity sha512-FNHlizdwjLmX7MQjsArGuj7SVfrQ9UCqk9JIiMaBt/J9WtIEZQxFtilKYjaIDyd4gZiZ9EImKVvR2bVyd8ExeQ==
+  dependencies:
+    jose "^5.2.3"
+    zod "^3.25.1"
+
 "@floating-ui/core@^1.7.1":
   version "1.7.1"
   resolved "https://registry.npmjs.org/@floating-ui/core/-/core-1.7.1.tgz"
@@ -5765,6 +5773,11 @@ iterator.prototype@^1.1.4:
     has-symbols "^1.1.0"
     set-function-name "^2.0.2"
 
+jose@^5.2.3:
+  version "5.10.0"
+  resolved "https://registry.yarnpkg.com/jose/-/jose-5.10.0.tgz#c37346a099d6467c401351a9a0c2161e0f52c4be"
+  integrity sha512-s+3Al/p9g32Iq+oqXxkW//7jk2Vig6FF1CFqzVXoTUXt2qz89YWbL+OwS17NFYEvxC35n0FKeGO2LGYSxeM2Gg==
+
 "js-tokens@^3.0.0 || ^4.0.0", js-tokens@^4.0.0:
   version "4.0.0"
   resolved "https://registry.npmjs.org/js-tokens/-/js-tokens-4.0.0.tgz"
@@ -8121,6 +8134,11 @@ zod@3.25.75:
   version "3.25.75"
   resolved "https://registry.yarnpkg.com/zod/-/zod-3.25.75.tgz#8ff9be2fbbcb381a9236f9f74a8879ca29dcc504"
   integrity sha512-OhpzAmVzabPOL6C3A3gpAifqr9MqihV/Msx3gor2b2kviCgcb+HM9SEOpMWwwNp9MRunWnhtAKUoo0AHhjyPPg==
+
+zod@^3.25.1:
+  version "3.25.76"
+  resolved "https://registry.yarnpkg.com/zod/-/zod-3.25.76.tgz#26841c3f6fd22a6a2760e7ccb719179768471e34"
+  integrity sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==
 
 zustand@5.0.0:
   version "5.0.0"

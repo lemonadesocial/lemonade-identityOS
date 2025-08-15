@@ -16,13 +16,15 @@ export function addCorsHeaders(response: NextResponse): NextResponse {
 export const parseRequest = async (request: NextRequest) => {
   const payload: {
     identity: {
-      traits: { wallet?: string; email?: string; unicorn_wallet?: string };
+      traits: { wallet?: string; email?: string; unicorn_wallet?: string; farcaster_fid?: string };
       metadata_public?: {
         verified_wallet?: string;
         verified_unicorn_wallet?: string;
       };
     };
     transient_payload?: {
+      farcaster_jwt?: string;
+      farcaster_app_hostname?: string;
       unicorn_auth_cookie?: string;
       wallet_signature?: string;
       wallet_signature_token?: string;

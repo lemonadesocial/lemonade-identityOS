@@ -1,16 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { FARCASTER_ISSUER, getFarcasterIdentifier, verifyJwt } from "../../../../../common/farcaster";
+import { verifyAuthCookie } from "../../../../../common/unicorn";
 import { parseRequest, returnError } from "../../../../../server/request";
 import { verifyWalletSignature } from "../../../../../server/wallet";
-import { verifyAuthCookie } from "../../../../../common/unicorn";
 
 export async function POST(request: NextRequest) {
   const { transient_payload, ...bodyRest } = await parseRequest(request);
 
   const wallet = bodyRest.identity.traits.wallet?.toLowerCase();
   const unicorn_wallet = bodyRest.identity.traits.unicorn_wallet?.toLowerCase();
+  const farcaster_fid = bodyRest.identity.traits.farcaster_fid?.toLowerCase();
 
-  if (!wallet && !unicorn_wallet) {
+  if (!wallet && !unicorn_wallet && !farcaster_fid) {
     return NextResponse.json(bodyRest);
   }
 
@@ -47,6 +49,18 @@ export async function POST(request: NextRequest) {
     );
 
     metadata_public.verified_wallet = wallet;
+  }
+
+  if (transient_payload?.farcaster_jwt && transient_payload.farcaster_app_hostname) {
+    if (!farcaster_fid) {
+      return returnError("Farcaster FID is required");
+    }
+
+    const payload = await verifyJwt(transient_payload.farcaster_jwt, transient_payload.farcaster_app_hostname);
+
+    if (getFarcasterIdentifier(payload.sub) !== farcaster_fid || payload.iss !== FARCASTER_ISSUER) {
+      return returnError("Invalid farcaster jwt");
+    }
   }
 
   return NextResponse.json({

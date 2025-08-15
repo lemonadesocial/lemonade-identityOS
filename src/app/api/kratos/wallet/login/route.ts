@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { FARCASTER_ISSUER, getFarcasterIdentifier, verifyJwt } from "../../../../../common/farcaster";
 import { verifyAuthCookie } from "../../../../../common/unicorn";
 import { parseRequest, returnError } from "../../../../../server/request";
 import { verifyWalletSignature } from "../../../../../server/wallet";
@@ -9,8 +10,9 @@ export async function POST(request: NextRequest) {
 
   const wallet = bodyRest.identity.traits.wallet?.toLowerCase();
   const unicorn_wallet = bodyRest.identity.traits.unicorn_wallet?.toLowerCase();
+  const farcaster_fid = bodyRest.identity.traits.farcaster_fid?.toLowerCase();
 
-  if (!wallet && !unicorn_wallet) {
+  if (!wallet && !unicorn_wallet && !farcaster_fid) {
     return returnError("Password login for email is disabled");
   }
 
@@ -29,7 +31,19 @@ export async function POST(request: NextRequest) {
     if (authCookie.storedToken.authDetails.walletAddress?.toLowerCase() !== unicorn_wallet) {
       return returnError("Wallet address mismatch");
     }
-  } else if (transient_payload?.wallet_signature && transient_payload?.wallet_signature_token) {
+  }
+  else if (transient_payload?.farcaster_jwt && transient_payload.farcaster_app_hostname) {
+    if (!farcaster_fid) {
+      return returnError("Farcaster FID is required");
+    }
+
+    const payload = await verifyJwt(transient_payload.farcaster_jwt, transient_payload.farcaster_app_hostname);
+
+    if (getFarcasterIdentifier(payload.sub) !== farcaster_fid || payload.iss !== FARCASTER_ISSUER) {
+      return returnError("Invalid farcaster jwt");
+    }
+  }
+  else if (transient_payload?.wallet_signature && transient_payload?.wallet_signature_token) {
     if (!wallet) {
       return returnError("Wallet is required");
     }

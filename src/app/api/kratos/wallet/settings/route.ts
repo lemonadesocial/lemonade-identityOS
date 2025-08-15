@@ -10,8 +10,9 @@ export async function POST(request: NextRequest) {
   const wallet = bodyRest.identity.traits.wallet?.toLowerCase();
   const unicorn_wallet = bodyRest.identity.traits.unicorn_wallet?.toLowerCase();
   const email = bodyRest.identity.traits.email;
+  const farcaster_fid = bodyRest.identity.traits.farcaster_fid;
 
-  if (!wallet && !unicorn_wallet && !email) {
+  if (!wallet && !unicorn_wallet && !farcaster_fid && !email) {
     return returnError("Missing required identifier");
   }
 

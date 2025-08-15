@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@farcaster/quick-auth": "^0.0.7",
     "@ory/elements-react": "^1.0.0-rc.5",
     "@ory/nextjs": "^1.0.0-rc.0",
     "@tanstack/react-query": "^5.80.6",
