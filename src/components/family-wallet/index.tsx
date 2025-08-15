@@ -1,7 +1,10 @@
 "use client";
 
+import { LoginFlow, RegistrationFlow } from "@ory/client-fetch";
 import { ConnectKitButton } from "connectkit";
 import { useEffect } from "react";
+
+import { useUnicornHandle } from "../../client/unicorn";
 
 import Spinner from "./spinner.svg";
 import { useWalletPopup } from "./web3-provider";
@@ -10,14 +13,21 @@ import { useWalletPopup } from "./web3-provider";
 const buttonClassName =
   "gap-3 border border-button-social-border-default bg-button-social-background-default hover:bg-button-social-background-hover transition-colors rounded-buttons flex items-center justify-center px-4 py-[13px] loading:bg-button-social-background-disabled loading:border-button-social-border-disabled loading:text-button-social-foreground-disabled hover:text-button-social-foreground-hover";
 
-interface Props {
+interface Props<T extends LoginFlow | RegistrationFlow> {
+  flow: T;
   onLogin: (
     args: { signature: string; address: string; token: string },
     disconnect: () => void,
   ) => void;
+  unicornCookieHandler: (flow: T, wallet: string, cookie: string) => Promise<void>;
 }
-export default function FamilyWallet({ onLogin }: Props) {
+export default function FamilyWallet<T extends LoginFlow | RegistrationFlow>({
+  flow,
+  onLogin,
+  unicornCookieHandler,
+}: Props<T>) {
   const { account, signing, setSigning, signature, sign } = useWalletPopup(onLogin);
+  const { processing } = useUnicornHandle(flow, unicornCookieHandler);
 
   useEffect(() => {
     if (account.isConnected && !signing && !signature) {
@@ -29,22 +39,21 @@ export default function FamilyWallet({ onLogin }: Props) {
     }
   }, [account.isConnected, signing, signature]);
 
+  const disabled = processing || signing || !!signature;
+
   return (
     <ConnectKitButton.Custom>
       {({ show, isConnecting }) => {
         return (
           <button
+            disabled={disabled}
             className={buttonClassName}
             onClick={(e) => {
               e.preventDefault();
               show?.();
             }}
           >
-            {signing || isConnecting || signature ? (
-              <Spinner color={"#ffffff"} alt="loading" />
-            ) : (
-              "Wallet"
-            )}
+            {disabled || isConnecting ? <Spinner color={"#ffffff"} alt="loading" /> : "Wallet"}
           </button>
         );
       }}

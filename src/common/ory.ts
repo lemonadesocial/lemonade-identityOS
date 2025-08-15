@@ -8,6 +8,8 @@ import {
   UiNodeInputAttributes,
 } from "@ory/client-fetch";
 
+export const dummyWalletPassword = "!!dummy-WALLET-password@@";
+
 export const oauthApi = new OAuth2Api(
   new Configuration({
     basePath: process.env.HYDRA_ADMIN_URL,
@@ -50,9 +52,12 @@ export function getFlowWithSomeInputsHidden(flow: RegistrationFlow) {
       ...flow.ui,
       nodes: flow.ui.nodes.filter(
         (node) =>
-          !["traits.first_name", "traits.last_name", "traits.wallet"].includes(
-            (node.attributes as UiNodeInputAttributes).name,
-          ) && node.group !== "password",
+          ![
+            "traits.first_name",
+            "traits.last_name",
+            "traits.wallet",
+            "traits.unicorn_wallet",
+          ].includes((node.attributes as UiNodeInputAttributes).name) && node.group !== "password",
       ),
     },
   } as RegistrationFlow;

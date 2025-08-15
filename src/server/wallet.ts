@@ -1,11 +1,11 @@
 import assert from "assert";
 import { randomUUID } from "crypto";
 import * as ethers from "ethers";
-import { NextRequest, NextResponse } from "next/server";
 
 import { sign, verify } from "../utils/jwt";
 
 import { getRedis } from "./redis";
+import { returnError } from "./request";
 
 export const getWalletMessageWithToken = async (wallet: string) => {
   const jwtSecret = process.env.JWT_SECRET;
@@ -44,56 +44,11 @@ export const verifySignerFromSignatureAndToken = async (signature: string, token
   return signer;
 };
 
-export const returnError = (message: string) => {
-  return new NextResponse(
-    JSON.stringify({
-      messages: [
-        {
-          messages: [
-            {
-              id: 1,
-              text: message,
-              type: "error",
-            },
-          ],
-        },
-      ],
-    }),
-    {
-      status: 400,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    },
-  );
-};
-
-export const parseRequest = async (request: NextRequest) => {
-  const payload: {
-    identity: {
-      traits: { wallet?: string; email?: string };
-      metadata_public?: {
-        verified_wallet?: string;
-      };
-    };
-    transient_payload?: {
-      wallet_signature?: string;
-      wallet_signature_token?: string;
-    };
-  } = await request.json();
-
-  return payload;
-};
-
 export const verifyWalletSignature = async (
   wallet: string,
-  wallet_signature?: string,
-  wallet_signature_token?: string,
+  wallet_signature: string,
+  wallet_signature_token: string,
 ) => {
-  if (!wallet_signature || !wallet_signature_token) {
-    return returnError("Wallet signature and token are required");
-  }
-
   const signer = await verifySignerFromSignatureAndToken(wallet_signature, wallet_signature_token);
 
   if (signer.toLowerCase() !== wallet) {

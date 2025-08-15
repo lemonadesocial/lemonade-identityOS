@@ -7,8 +7,9 @@ import { useModal } from "connectkit";
 import { useEffect, useRef } from "react";
 import { useFormContext } from "react-hook-form";
 
-import { handleProfileUpdate, handleUnlinkWallet, handleWalletUpdate } from "../../client/ory";
+import { handleProfileUpdate } from "../../client/ory";
 import { overridedComponents } from "../../client/ui";
+import { handleUnlinkWallet, handleWalletUpdate } from "../../client/wallet";
 
 import { type PageProps } from "../../common/types";
 import { useWalletPopup, Web3Provider } from "../../components/family-wallet/web3-provider";
@@ -19,7 +20,7 @@ const getFlowNodes = (flow: SettingsFlow) => {
     if (
       node.group === "profile" &&
       "name" in node.attributes &&
-      node.attributes.name === "traits.wallet"
+      ["traits.wallet", "traits.unicorn_wallet"].includes(node.attributes.name)
     ) {
       return [{ ...node, attributes: { ...node.attributes, disabled: true } }];
     }
