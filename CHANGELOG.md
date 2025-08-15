@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.3.0](https://github.com/lemonadesocial/lemonade-identityOS/compare/v1.2.1...v1.3.0) (2025-08-15)
+
+
+### Features
+
+* add env ([a579d43](https://github.com/lemonadesocial/lemonade-identityOS/commit/a579d43c3cb2819da6dcb3c08841120cb39b130a))
+* **farcaster:** handle login with Farcaster JWT ([9b5c6ed](https://github.com/lemonadesocial/lemonade-identityOS/commit/9b5c6ed6104917ec8e237ba75b14e301da88feb4))
+* implement verify jwt ([1efc3a9](https://github.com/lemonadesocial/lemonade-identityOS/commit/1efc3a9cb5271af1fb9a698240115c6c7a215ba3))
+* return identityId if matched ([a4c19ab](https://github.com/lemonadesocial/lemonade-identityOS/commit/a4c19ab2e943c531185cddd7bc5e06f501930a3d))
+* set password after link with unicorn ([a8ad0f3](https://github.com/lemonadesocial/lemonade-identityOS/commit/a8ad0f37f17359ac76928841252bebae8f1add9e))
+* update cors for some APIs ([0a7a961](https://github.com/lemonadesocial/lemonade-identityOS/commit/0a7a96126b05265f616598f182d92e3bd21262e4))
+
+
+### Bug Fixes
+
+* fix canlink check & add force redirect ([c4f96ab](https://github.com/lemonadesocial/lemonade-identityOS/commit/c4f96ab636baf565383c2c8c031456a85d4fc0c2))
+
 ## [1.2.1](https://github.com/lemonadesocial/lemonade-identityOS/compare/v1.2.0...v1.2.1) (2025-07-14)
 
 
