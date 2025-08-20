@@ -28,7 +28,6 @@ async function processPost(request: NextRequest) {
 
   try {
     if (identifier && password && transient_payload) {
-      //-- process password login
       const flow = await frontendApi.updateLoginFlow({
         flow: loginFlow.id,
         updateLoginFlowBody: {
