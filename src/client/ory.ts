@@ -9,12 +9,13 @@ import {
   UpdateRegistrationFlowWithPasswordMethod,
   UpdateSettingsFlowBody,
   UpdateSettingsFlowWithProfileMethod,
+  VerificationFlow,
 } from "@ory/client-fetch";
 
 import { frontendApi } from "../common/ory";
 
 export function getCsrfToken(
-  flow: LoginFlow | RegistrationFlow | SettingsFlow,
+  flow: LoginFlow | RegistrationFlow | SettingsFlow | VerificationFlow,
 ): string | undefined {
   const csrfNode = flow.ui.nodes.find(
     (node) => "name" in node.attributes && node.attributes.name === "csrf_token",
@@ -34,7 +35,9 @@ export function handleFlowSuccess(
   let redirectUrl = forceRedirect;
 
   if (!redirectUrl) {
-    const redirect = success.continue_with?.find((action) => action.action === "redirect_browser_to");
+    const redirect = success.continue_with?.find(
+      (action) => action.action === "redirect_browser_to",
+    );
 
     if (verification?.flow.url) {
       //-- prioritize verification over redirect
