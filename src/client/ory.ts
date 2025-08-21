@@ -34,7 +34,9 @@ export function handleFlowSuccess(
   let redirectUrl = forceRedirect;
 
   if (!redirectUrl) {
-    const redirect = success.continue_with?.find((action) => action.action === "redirect_browser_to");
+    const redirect = success.continue_with?.find(
+      (action) => action.action === "redirect_browser_to",
+    );
 
     if (verification?.flow.url) {
       //-- prioritize verification over redirect
