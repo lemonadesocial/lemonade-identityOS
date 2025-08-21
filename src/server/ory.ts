@@ -27,6 +27,16 @@ export interface TransientPayload {
   wallet_signature_token?: string;
 }
 
+export const extendSession = async (sessionId: string) => {
+  const response = await fetch(
+    `${process.env.KRATOS_ADMIN_URL}/admin/sessions/${sessionId}/extend`, { method: 'PATCH' }
+  );
+
+  const data: { expires_at: string } = await response.json();
+
+  return data;
+};
+
 export const getUserByIdentifier = async (identifier: string) => {
   const response = await fetch(
     `${process.env.KRATOS_ADMIN_URL}/admin/identities?credentials_identifier=${identifier}`,
