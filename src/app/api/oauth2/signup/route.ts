@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { getCsrfToken } from "../../../../client/ory";
+import { Session } from "../../../../common/oauth2";
 import { frontendApi } from "../../../../common/ory";
 import { TransientPayload } from "../../../../server/ory";
 import { addCorsHeaders } from "../../../../server/request";
@@ -16,7 +17,7 @@ async function processPost(request: NextRequest) {
   const password: string | undefined = body.password;
   const transient_payload = body.transient_payload as TransientPayload | undefined;
 
-  let token: string | undefined;
+  let session: Session | undefined;
 
   const registrationFlow = !flowId
     ? await frontendApi.createNativeRegistrationFlow()
@@ -38,7 +39,9 @@ async function processPost(request: NextRequest) {
         },
       });
 
-      token = flow.session_token;
+      if (flow.session_token && flow.session?.expires_at) {
+        session = { token: flow.session_token, expires_at: flow.session.expires_at.toISOString() };
+      }
     } else if (traits && method === "code") {
       const flow = await frontendApi.updateRegistrationFlow({
         flow: registrationFlow.id,
@@ -51,7 +54,9 @@ async function processPost(request: NextRequest) {
         },
       });
 
-      token = flow.session_token;
+      if (flow.session_token && flow.session?.expires_at) {
+        session = { token: flow.session_token, expires_at: flow.session.expires_at.toISOString() };
+      }
     }
   }
   catch (err: any) {
@@ -59,7 +64,7 @@ async function processPost(request: NextRequest) {
     messages = errorFLow.ui.messages;
   }
 
-  return NextResponse.json({ flow_id: registrationFlow.id, token, error: messages }, { status: 200 });
+  return NextResponse.json({ flow_id: registrationFlow.id, session, error: messages }, { status: 200 });
 }
 
 export async function POST(request: NextRequest) {
