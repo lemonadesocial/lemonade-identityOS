@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/lemonadesocial/lemonade-identityOS/compare/v1.3.0...v1.4.0) (2025-08-21)
+
+
+### Features
+
+* **oauth2:** implement native flow for whitelabel ([#26](https://github.com/lemonadesocial/lemonade-identityOS/issues/26)) ([fa59ff4](https://github.com/lemonadesocial/lemonade-identityOS/commit/fa59ff448d09e7643266ebf6b8c304e8c7307f76))
+
 ## [1.3.0](https://github.com/lemonadesocial/lemonade-identityOS/compare/v1.2.1...v1.3.0) (2025-08-15)
 
 
