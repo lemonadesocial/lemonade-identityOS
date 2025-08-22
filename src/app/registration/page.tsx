@@ -11,5 +11,14 @@ export default async function RegistrationPage(props: OryPageParams) {
     return null;
   }
 
-  return <RegistrationUI flow={flow} config={config} />;
+  let provider: string | undefined;
+
+  if (flow.oauth2_login_request) {
+    //-- this is oauth2 login request, check if there is default provider selected
+    const url = new URL(flow.oauth2_login_request.request_url);
+
+    provider = url.searchParams.get("provider") ?? undefined;
+  }
+
+  return <RegistrationUI flow={flow} config={config} provider={provider} />;
 }

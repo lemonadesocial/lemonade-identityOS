@@ -5,11 +5,13 @@ import { OryNodeOidcButtonProps, useOryFlow } from "@ory/elements-react";
 import { DefaultButtonSocial, DefaultFormContainer, Login } from "@ory/elements-react/theme";
 import { useEffect } from "react";
 
+import { getCsrfToken } from "../../client/ory";
 import { overridedComponents } from "../../client/ui";
 import { handleUnicornLogin } from "../../client/unicorn";
 import { handleWalletLogin } from "../../client/wallet";
 
 import {
+  frontendApi,
   getFlowWithMutatedIndentifierInputNode,
   getFlowWithOidcNodesSorted,
   getFlowWithSomeInputsHidden,
@@ -77,11 +79,46 @@ function LoginFormRoot(props: any) {
 
 interface Props extends PageProps {
   flow: LoginFlow;
+  provider?: string;
 }
-export default function LoginUI({ flow, config }: Props) {
+export default function LoginUI({ flow, config, provider }: Props) {
   const updatedFlow = getFlowWithMutatedIndentifierInputNode(
     getFlowWithOidcNodesSorted(getFlowWithSomeInputsHidden(flow)),
   );
+
+  useEffect(() => {
+    if (provider) {
+      //-- oidc provider selected, trigger and redirect
+      frontendApi
+        .updateLoginFlow(
+          {
+            flow: flow.id,
+            updateLoginFlowBody: {
+              method: "oidc",
+              provider,
+              csrf_token: getCsrfToken(flow),
+            },
+          },
+          {
+            credentials: "include",
+          },
+        )
+        .catch((err) => err.response.json())
+        .then((err) => {
+          if (err.redirect_browser_to) {
+            window.location.href = err.redirect_browser_to;
+          }
+        });
+    }
+  }, [flow, provider]);
+
+  if (provider) {
+    return (
+      <Page>
+        <div>Redirecting...</div>
+      </Page>
+    );
+  }
 
   return (
     <Web3Provider>
