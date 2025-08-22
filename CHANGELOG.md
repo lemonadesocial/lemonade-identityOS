@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.5.0](https://github.com/lemonadesocial/lemonade-identityOS/compare/v1.4.0...v1.5.0) (2025-08-22)
+
+
+### Features
+
+* **login:** handle default oidc provider ([#29](https://github.com/lemonadesocial/lemonade-identityOS/issues/29)) ([50f5a4c](https://github.com/lemonadesocial/lemonade-identityOS/commit/50f5a4c31143235aeda442673a0ccd8cfbae3fe6))
+* **verification:** add setting & verification routes ([#30](https://github.com/lemonadesocial/lemonade-identityOS/issues/30)) ([ba44740](https://github.com/lemonadesocial/lemonade-identityOS/commit/ba44740f9389c032b570ffa0b1cfa789d2c5c26a))
+
 ## [1.4.0](https://github.com/lemonadesocial/lemonade-identityOS/compare/v1.3.0...v1.4.0) (2025-08-21)
 
 
