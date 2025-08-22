@@ -113,7 +113,11 @@ export default function LoginUI({ flow, config, provider }: Props) {
   }, [flow, provider]);
 
   if (provider) {
-    return <Page></Page>;
+    return (
+      <Page>
+        <div>Redirecting...</div>
+      </Page>
+    );
   }
 
   return (

@@ -8,8 +8,13 @@ import { useEffect } from "react";
 import { overridedComponents } from "../../client/ui";
 import { handleUnicornRegistration } from "../../client/unicorn";
 import { handleWalletRegistration } from "../../client/wallet";
+import { getCsrfToken } from "../../client/ory";
 
-import { getFlowWithOidcNodesSorted, getFlowWithSomeInputsHidden } from "../../common/ory";
+import {
+  frontendApi,
+  getFlowWithOidcNodesSorted,
+  getFlowWithSomeInputsHidden,
+} from "../../common/ory";
 import { PageProps } from "../../common/types";
 import CardWrapper from "../../components/card-wrapper";
 import FamilyWallet from "../../components/family-wallet";
@@ -71,9 +76,44 @@ function RegistrationFormRoot(props: any) {
 
 interface Props extends PageProps {
   flow: RegistrationFlow;
+  provider?: string;
 }
-export default function RegistrationUI({ flow, config }: Props) {
+export default function RegistrationUI({ flow, config, provider }: Props) {
   const updatedFlow = getFlowWithOidcNodesSorted(getFlowWithSomeInputsHidden(flow));
+
+  useEffect(() => {
+    if (provider) {
+      //-- oidc provider selected, trigger and redirect
+      frontendApi
+        .updateRegistrationFlow(
+          {
+            flow: flow.id,
+            updateRegistrationFlowBody: {
+              method: "oidc",
+              provider,
+              csrf_token: getCsrfToken(flow),
+            },
+          },
+          {
+            credentials: "include",
+          },
+        )
+        .catch((err) => err.response.json())
+        .then((err) => {
+          if (err.redirect_browser_to) {
+            window.location.href = err.redirect_browser_to;
+          }
+        });
+    }
+  }, [flow, provider]);
+
+  if (provider) {
+    return (
+      <Page>
+        <div>Redirecting...</div>
+      </Page>
+    );
+  }
 
   return (
     <Web3Provider>
