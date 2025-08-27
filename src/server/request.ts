@@ -22,6 +22,7 @@ export const parseRequest = async (request: NextRequest) => {
       metadata_public?: {
         verified_wallet?: string;
         verified_unicorn_wallet?: string;
+        verified_farcaster_fid?: string;
       };
     };
     transient_payload?: TransientPayload;
