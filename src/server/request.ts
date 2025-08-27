@@ -18,6 +18,7 @@ export function addCorsHeaders(response: NextResponse): NextResponse {
 export const parseRequest = async (request: NextRequest) => {
   const payload: {
     identity: {
+      id: string;
       traits: { wallet?: string; email?: string; unicorn_wallet?: string; farcaster_fid?: string };
       metadata_public?: {
         verified_wallet?: string;
