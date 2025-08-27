@@ -17,12 +17,11 @@ async function processPost(request: NextRequest) {
   const user = await getUserByIdentifier(userFID);
 
   return NextResponse.json({
-    identityId: user?.id,
-    canLink: !!user,
+    userFID,
+    userId: user?.id,
   });
 }
 
-//-- check if the unicorn authCookie contains credential that can be used to link to existing account
 export async function POST(request: NextRequest) {
   const response = await processPost(request);
   return addCorsHeaders(response);
