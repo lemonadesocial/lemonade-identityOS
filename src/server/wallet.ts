@@ -1,5 +1,5 @@
 import assert from "assert";
-import { randomUUID } from "crypto";
+import { randomBytes, randomUUID } from "crypto";
 import * as ethers from "ethers";
 
 import { sign, verify } from "../utils/jwt";
@@ -7,9 +7,32 @@ import { sign, verify } from "../utils/jwt";
 import { getRedis } from "./redis";
 import { returnError } from "./request";
 
-export const getWalletMessageWithToken = async (wallet: string) => {
+const getJwtSecret = () => {
   const jwtSecret = process.env.JWT_SECRET;
   assert.ok(jwtSecret, "JWT_SECRET is missing");
+  return jwtSecret;
+};
+
+export const getSignedNonce = async () => {
+  const jwtSecret = getJwtSecret();
+
+  const nonce = randomBytes(32).toString("hex");
+
+  const token = await sign({ nonce }, jwtSecret, { expiresIn: 3600 });
+
+  return { nonce, token };
+};
+
+export const verifySignedNonce = async (nonce: string, token: string) => {
+  const jwtSecret = getJwtSecret();
+
+  const { nonce: storedNonce } = await verify<{ nonce: string }>(token, jwtSecret);
+
+  assert.strictEqual(nonce, storedNonce, "nonce mismatch");
+};
+
+export const getWalletMessageWithToken = async (wallet: string) => {
+  const jwtSecret = getJwtSecret();
 
   const nonce = randomUUID();
 
@@ -21,9 +44,7 @@ export const getWalletMessageWithToken = async (wallet: string) => {
 };
 
 export const verifySignerFromSignatureAndToken = async (signature: string, token: string) => {
-  const jwtSecret = process.env.JWT_SECRET;
-
-  assert.ok(jwtSecret, "JWT_SECRET is missing");
+  const jwtSecret = getJwtSecret();
 
   const { wallet, nonce, message, exp } = await verify<{
     wallet: string;
