@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCsrfToken } from "../../../../client/ory";
 import { Session } from "../../../../common/oauth2";
 import { frontendApi } from "../../../../common/ory";
-import { TransientPayload } from "../../../../server/ory";
+import { TransientPayload } from "../../../../common/types";
 import { addCorsHeaders } from "../../../../server/request";
 
 async function processPost(request: NextRequest) {
@@ -58,8 +58,7 @@ async function processPost(request: NextRequest) {
         session = { token: flow.session_token, expires_at: flow.session.expires_at.toISOString() };
       }
     }
-  }
-  catch (err: any) {
+  } catch (err: any) {
     const errorFLow = await err.response.json();
     messages = errorFLow.ui.messages;
   }

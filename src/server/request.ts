@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { TransientPayload } from "./ory";
+import { TransientPayload } from "../common/types";
 
 export function addCorsHeaders(response: NextResponse): NextResponse {
   response.headers.set("Access-Control-Allow-Origin", "*");

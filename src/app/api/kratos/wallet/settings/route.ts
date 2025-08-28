@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
   const metadata_public: Record<string, string> = {};
 
   if (wallet && wallet !== bodyRest.identity.metadata_public?.verified_wallet) {
-    if (!transient_payload?.wallet_signature || !transient_payload?.wallet_signature_token) {
+    if (!transient_payload || !("wallet_signature" in transient_payload)) {
       return returnError("Missing required transient payload");
     }
 
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     unicorn_wallet &&
     unicorn_wallet !== bodyRest.identity.metadata_public?.verified_unicorn_wallet
   ) {
-    if (!transient_payload?.unicorn_auth_cookie) {
+    if (!transient_payload || !("unicorn_auth_cookie" in transient_payload)) {
       return returnError("Missing required transient payload");
     }
 
@@ -59,25 +59,15 @@ export async function POST(request: NextRequest) {
     farcaster_fid &&
     farcaster_fid !== bodyRest.identity.metadata_public?.verified_farcaster_fid
   ) {
-    if (
-      transient_payload?.farcaster_siwe_message &&
-      transient_payload?.farcaster_siwe_signature &&
-      transient_payload?.farcaster_siwe_nonce &&
-      transient_payload?.farcaster_size_nonce_token
-    ) {
-      const userFID = await verifyFarcasterSIWE({
-        message: transient_payload.farcaster_siwe_message,
-        signature: transient_payload.farcaster_siwe_signature,
-        nonce: transient_payload.farcaster_siwe_nonce,
-        token: transient_payload.farcaster_size_nonce_token,
-      });
+    if (transient_payload && "farcaster_siwe_message" in transient_payload) {
+      const userFID = await verifyFarcasterSIWE(transient_payload);
 
       if (!userFID) {
         return returnError("Invalid farcaster payload");
       }
 
       metadata_public.verified_farcaster_fid = userFID;
-    } else if (transient_payload?.farcaster_jwt && transient_payload.farcaster_app_hostname) {
+    } else if (transient_payload && "farcaster_jwt" in transient_payload) {
       const payload = await verifyJwt(
         transient_payload.farcaster_jwt,
         transient_payload.farcaster_app_hostname,

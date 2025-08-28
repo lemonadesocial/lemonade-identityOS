@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { getCsrfToken } from "../../../../client/ory";
 import { frontendApi } from "../../../../common/ory";
-import { TransientPayload } from "../../../../server/ory";
+import { TransientPayload } from "../../../../common/types";
 import { addCorsHeaders } from "../../../../server/request";
 
 async function processPost(request: NextRequest) {

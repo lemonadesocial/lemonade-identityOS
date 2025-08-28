@@ -23,25 +23,6 @@ export interface Identity {
   }[];
 }
 
-export interface TransientPayload {
-  //-- login with farcaster siwe
-  farcaster_siwe_nonce?: string;
-  farcaster_size_nonce_token?: string;
-  farcaster_siwe_signature?: string;
-  farcaster_siwe_message?: string;
-
-  //-- login with farcaster mini app
-  farcaster_jwt?: string;
-  farcaster_app_hostname?: string;
-
-  //-- login with unicorn
-  unicorn_auth_cookie?: string;
-
-  //-- login with EOA wallet
-  wallet_signature?: string;
-  wallet_signature_token?: string;
-}
-
 export const extendSession = async (sessionId: string) => {
   const response = await fetch(
     `${process.env.KRATOS_ADMIN_URL}/admin/sessions/${sessionId}/extend`,

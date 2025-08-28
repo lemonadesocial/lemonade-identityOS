@@ -1,14 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { FarcasterSiwePayload } from "../../../../common/farcaster";
+import {
+  FarcasterJwtPayload,
+  FarcasterSiwePayload,
+  getFarcasterIdentifier,
+  verifyJwt,
+} from "../../../../common/farcaster";
 import { verifyFarcasterSIWE } from "../../../../server/farcaster";
 import { getUserByIdentifier } from "../../../../server/ory";
 import { addCorsHeaders, returnError } from "../../../../server/request";
 
 async function processPost(request: NextRequest) {
-  const body = (await request.json()) as FarcasterSiwePayload;
+  const body = (await request.json()) as FarcasterSiwePayload | FarcasterJwtPayload;
 
-  const userFID = await verifyFarcasterSIWE(body);
+  let userFID: string | undefined;
+
+  if (body && "farcaster_siwe_message" in body) {
+    userFID = await verifyFarcasterSIWE(body);
+  } else if ("farcaster_jwt" in body) {
+    const payload = await verifyJwt(body.farcaster_jwt, body.farcaster_app_hostname);
+
+    userFID = getFarcasterIdentifier(payload.sub);
+  }
 
   if (!userFID) {
     return returnError("Cannot verify farcaster payload");

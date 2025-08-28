@@ -1,6 +1,11 @@
 import { SiweMessage } from "siwe";
 import { verifyMessage } from "viem";
 
+export type EOAWalletPayload = {
+  wallet_signature: string;
+  wallet_signature_token: string;
+};
+
 export async function verifySiwe(nonce: string, message: string, signature: string) {
   // Parse SIWE message
   const siweMessage = new SiweMessage(message);

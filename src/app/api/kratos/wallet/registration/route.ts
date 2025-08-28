@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
 
   const metadata_public: Record<string, string> = {};
 
-  if (transient_payload?.unicorn_auth_cookie) {
+  if (transient_payload && "unicorn_auth_cookie" in transient_payload) {
     if (!unicorn_wallet) {
       return returnError("Unicorn wallet is required");
     }
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     metadata_public.verified_unicorn_wallet = unicorn_wallet;
   }
 
-  if (transient_payload?.wallet_signature && transient_payload?.wallet_signature_token) {
+  if (transient_payload && "wallet_signature" in transient_payload) {
     if (!wallet) {
       return returnError("Wallet is required");
     }
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
     metadata_public.verified_wallet = wallet;
   }
 
-  if (transient_payload?.farcaster_jwt && transient_payload.farcaster_app_hostname) {
+  if (transient_payload && "farcaster_jwt" in transient_payload) {
     if (!farcaster_fid) {
       return returnError("Farcaster FID is required");
     }
@@ -71,22 +71,12 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  if (
-    transient_payload?.farcaster_siwe_message &&
-    transient_payload?.farcaster_siwe_signature &&
-    transient_payload?.farcaster_siwe_nonce &&
-    transient_payload?.farcaster_size_nonce_token
-  ) {
+  if (transient_payload && "farcaster_siwe_message" in transient_payload) {
     if (!farcaster_fid) {
       return returnError("Farcaster FID is required");
     }
 
-    const userFID = await verifyFarcasterSIWE({
-      message: transient_payload.farcaster_siwe_message,
-      signature: transient_payload.farcaster_siwe_signature,
-      nonce: transient_payload.farcaster_siwe_nonce,
-      token: transient_payload.farcaster_size_nonce_token,
-    });
+    const userFID = await verifyFarcasterSIWE(transient_payload);
 
     if (userFID !== farcaster_fid) {
       return returnError("Invalid farcaster payload");

@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     return returnError("Password login for email is disabled");
   }
 
-  if (transient_payload?.unicorn_auth_cookie) {
+  if (transient_payload && "unicorn_auth_cookie" in transient_payload) {
     if (!unicorn_wallet) {
       return returnError("Unicorn wallet is required");
     }
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     if (authCookie.storedToken.authDetails.walletAddress?.toLowerCase() !== unicorn_wallet) {
       return returnError("Wallet address mismatch");
     }
-  } else if (transient_payload?.farcaster_jwt && transient_payload.farcaster_app_hostname) {
+  } else if (transient_payload && "farcaster_jwt" in transient_payload) {
     if (!farcaster_fid) {
       return returnError("Farcaster FID is required");
     }
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
     if (getFarcasterIdentifier(payload.sub) !== farcaster_fid || payload.iss !== FARCASTER_ISSUER) {
       return returnError("Invalid farcaster jwt");
     }
-  } else if (transient_payload?.wallet_signature && transient_payload?.wallet_signature_token) {
+  } else if (transient_payload && "wallet_signature" in transient_payload) {
     if (!wallet) {
       return returnError("Wallet is required");
     }
@@ -59,22 +59,12 @@ export async function POST(request: NextRequest) {
       transient_payload.wallet_signature,
       transient_payload.wallet_signature_token,
     );
-  } else if (
-    transient_payload?.farcaster_siwe_message &&
-    transient_payload?.farcaster_siwe_signature &&
-    transient_payload?.farcaster_siwe_nonce &&
-    transient_payload?.farcaster_size_nonce_token
-  ) {
+  } else if (transient_payload && "farcaster_siwe_message" in transient_payload) {
     if (!farcaster_fid) {
       return returnError("Farcaster FID is not found");
     }
 
-    const userFID = await verifyFarcasterSIWE({
-      message: transient_payload.farcaster_siwe_message,
-      signature: transient_payload.farcaster_siwe_signature,
-      nonce: transient_payload.farcaster_siwe_nonce,
-      token: transient_payload.farcaster_size_nonce_token,
-    });
+    const userFID = await verifyFarcasterSIWE(transient_payload);
 
     if (userFID !== farcaster_fid) {
       return returnError("Invalid farcaster payload");
