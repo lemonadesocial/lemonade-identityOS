@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.0](https://github.com/lemonadesocial/lemonade-identityOS/compare/v1.5.0...v1.6.0) (2025-08-29)
+
+
+### Features
+
+* **farcaster:** implement with Farcaster SIWE ([#33](https://github.com/lemonadesocial/lemonade-identityOS/issues/33)) ([1219e4a](https://github.com/lemonadesocial/lemonade-identityOS/commit/1219e4ab89459b7e6c14822db9a9e39ab6f9e7d1))
+
 ## [1.5.0](https://github.com/lemonadesocial/lemonade-identityOS/compare/v1.4.0...v1.5.0) (2025-08-22)
 
 
