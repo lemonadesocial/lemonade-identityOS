@@ -1,3 +1,7 @@
+import assert from "assert";
+
+import { dummyWalletPassword } from "../common/ory";
+
 export interface Identity {
   id: string;
   traits: {
@@ -19,17 +23,10 @@ export interface Identity {
   }[];
 }
 
-export interface TransientPayload {
-  farcaster_jwt?: string;
-  farcaster_app_hostname?: string;
-  unicorn_auth_cookie?: string;
-  wallet_signature?: string;
-  wallet_signature_token?: string;
-}
-
 export const extendSession = async (sessionId: string) => {
   const response = await fetch(
-    `${process.env.KRATOS_ADMIN_URL}/admin/sessions/${sessionId}/extend`, { method: 'PATCH' }
+    `${process.env.KRATOS_ADMIN_URL}/admin/sessions/${sessionId}/extend`,
+    { method: "PATCH" },
   );
 
   const data: { expires_at: string } = await response.json();
@@ -46,12 +43,37 @@ export const getUserByIdentifier = async (identifier: string) => {
   return data[0] as Identity | undefined;
 };
 
+export const getUserById = async (id: string) => {
+  const response = await fetch(`${process.env.KRATOS_ADMIN_URL}/admin/identities/${id}`);
+  return (await response.json()) as Identity;
+};
+
 export const updateIdentity = async (id: string, update: Omit<Identity, "id">) => {
   await fetch(`${process.env.KRATOS_ADMIN_URL}/admin/identities/${id}`, {
     method: "PUT",
     body: JSON.stringify(update),
     headers: {
       "Content-Type": "application/json",
+    },
+  });
+};
+
+export const ensurePasswordAuth = async (userId: string) => {
+  const user = await getUserById(userId);
+
+  assert.ok(user);
+
+  const { id, credentials, ...rest } = user;
+
+  await updateIdentity(id, {
+    ...rest,
+    credentials: {
+      //-- the account may not have password set, we should reset it anyway
+      password: {
+        config: {
+          password: dummyWalletPassword,
+        },
+      },
     },
   });
 };

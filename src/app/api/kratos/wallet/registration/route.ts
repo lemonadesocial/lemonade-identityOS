@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { FARCASTER_ISSUER, getFarcasterIdentifier, verifyJwt } from "../../../../../common/farcaster";
+import {
+  FARCASTER_ISSUER,
+  getFarcasterIdentifier,
+  verifyJwt,
+} from "../../../../../common/farcaster";
 import { verifyAuthCookie } from "../../../../../common/unicorn";
+import { verifyFarcasterSIWE } from "../../../../../server/farcaster";
 import { parseRequest, returnError } from "../../../../../server/request";
 import { verifyWalletSignature } from "../../../../../server/wallet";
 
@@ -18,7 +23,7 @@ export async function POST(request: NextRequest) {
 
   const metadata_public: Record<string, string> = {};
 
-  if (transient_payload?.unicorn_auth_cookie) {
+  if (transient_payload && "unicorn_auth_cookie" in transient_payload) {
     if (!unicorn_wallet) {
       return returnError("Unicorn wallet is required");
     }
@@ -37,7 +42,7 @@ export async function POST(request: NextRequest) {
     metadata_public.verified_unicorn_wallet = unicorn_wallet;
   }
 
-  if (transient_payload?.wallet_signature && transient_payload?.wallet_signature_token) {
+  if (transient_payload && "wallet_signature" in transient_payload) {
     if (!wallet) {
       return returnError("Wallet is required");
     }
@@ -51,15 +56,30 @@ export async function POST(request: NextRequest) {
     metadata_public.verified_wallet = wallet;
   }
 
-  if (transient_payload?.farcaster_jwt && transient_payload.farcaster_app_hostname) {
+  if (transient_payload && "farcaster_jwt" in transient_payload) {
     if (!farcaster_fid) {
       return returnError("Farcaster FID is required");
     }
 
-    const payload = await verifyJwt(transient_payload.farcaster_jwt, transient_payload.farcaster_app_hostname);
+    const payload = await verifyJwt(
+      transient_payload.farcaster_jwt,
+      transient_payload.farcaster_app_hostname,
+    );
 
     if (getFarcasterIdentifier(payload.sub) !== farcaster_fid || payload.iss !== FARCASTER_ISSUER) {
       return returnError("Invalid farcaster jwt");
+    }
+  }
+
+  if (transient_payload && "farcaster_siwe_message" in transient_payload) {
+    if (!farcaster_fid) {
+      return returnError("Farcaster FID is required");
+    }
+
+    const userFID = await verifyFarcasterSIWE(transient_payload);
+
+    if (userFID !== farcaster_fid) {
+      return returnError("Invalid farcaster payload");
     }
   }
 

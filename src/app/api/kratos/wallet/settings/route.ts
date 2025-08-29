@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { getFarcasterIdentifier, verifyJwt } from "../../../../../common/farcaster";
 import { verifyAuthCookie } from "../../../../../common/unicorn";
+import { verifyFarcasterSIWE } from "../../../../../server/farcaster";
 import { parseRequest, returnError } from "../../../../../server/request";
 import { verifyWalletSignature } from "../../../../../server/wallet";
 
@@ -19,7 +21,7 @@ export async function POST(request: NextRequest) {
   const metadata_public: Record<string, string> = {};
 
   if (wallet && wallet !== bodyRest.identity.metadata_public?.verified_wallet) {
-    if (!transient_payload?.wallet_signature || !transient_payload?.wallet_signature_token) {
+    if (!transient_payload || !("wallet_signature" in transient_payload)) {
       return returnError("Missing required transient payload");
     }
 
@@ -36,7 +38,7 @@ export async function POST(request: NextRequest) {
     unicorn_wallet &&
     unicorn_wallet !== bodyRest.identity.metadata_public?.verified_unicorn_wallet
   ) {
-    if (!transient_payload?.unicorn_auth_cookie) {
+    if (!transient_payload || !("unicorn_auth_cookie" in transient_payload)) {
       return returnError("Missing required transient payload");
     }
 
@@ -51,6 +53,30 @@ export async function POST(request: NextRequest) {
     }
 
     metadata_public.verified_unicorn_wallet = unicorn_wallet;
+  }
+
+  if (
+    farcaster_fid &&
+    farcaster_fid !== bodyRest.identity.metadata_public?.verified_farcaster_fid
+  ) {
+    if (transient_payload && "farcaster_siwe_message" in transient_payload) {
+      const userFID = await verifyFarcasterSIWE(transient_payload);
+
+      if (!userFID) {
+        return returnError("Invalid farcaster payload");
+      }
+
+      metadata_public.verified_farcaster_fid = userFID;
+    } else if (transient_payload && "farcaster_jwt" in transient_payload) {
+      const payload = await verifyJwt(
+        transient_payload.farcaster_jwt,
+        transient_payload.farcaster_app_hostname,
+      );
+
+      metadata_public.verified_farcaster_fid = getFarcasterIdentifier(payload.sub);
+    } else {
+      return returnError("Missing required transient payload");
+    }
   }
 
   return NextResponse.json({

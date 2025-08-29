@@ -3,6 +3,10 @@ import jwtToPem from "jwk-to-pem";
 
 import { getOrSetMemoryCache } from "../utils/cache";
 
+export type UnicornAuthCookiePayload = {
+  unicorn_auth_cookie: string;
+};
+
 export interface AuthCookie {
   storedToken: {
     jwtToken: string;

@@ -55,9 +55,13 @@ function RegistrationFormRoot(props: any) {
 
   const newNodes = flow.ui.nodes.filter(
     (node) =>
-      !["traits.first_name", "traits.last_name", "traits.wallet"].includes(
-        (node.attributes as UiNodeInputAttributes).name,
-      ) && node.group !== "password",
+      ![
+        "traits.first_name",
+        "traits.last_name",
+        "traits.wallet",
+        "traits.unicorn_wallet",
+        "traits.farcaster_fid",
+      ].includes((node.attributes as UiNodeInputAttributes).name) && node.group !== "password",
   );
 
   const hasUnwantedInputs = newNodes.length !== flow.ui.nodes.length;
