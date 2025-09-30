@@ -1,14 +1,14 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 import { addCorsHeaders } from "../../../../server/request";
 import { getSignedNonce } from "../../../../server/wallet";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const response = await getSignedNonce();
-  return addCorsHeaders(NextResponse.json(response));
+  return addCorsHeaders(request, NextResponse.json(response));
 }
 
-export async function OPTIONS() {
+export async function OPTIONS(request: NextRequest) {
   const response = new NextResponse(null, { status: 200 });
-  return addCorsHeaders(response);
+  return addCorsHeaders(request, response);
 }
