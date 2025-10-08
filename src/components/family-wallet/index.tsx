@@ -4,10 +4,12 @@ import { LoginFlow, RegistrationFlow } from "@ory/client-fetch";
 import { ConnectKitButton } from "connectkit";
 import { useEffect } from "react";
 
+import { EOAWalletPayload } from "../../common/siwe";
+
 import { useUnicornHandle } from "../../client/unicorn";
+import { useWalletPopup } from "../../client/wallet";
 
 import Spinner from "./spinner.svg";
-import { useWalletPopup } from "./web3-provider";
 
 //-- this style is copied from ory default social button theme
 const buttonClassName =
@@ -19,20 +21,23 @@ interface Props<T extends LoginFlow | RegistrationFlow> {
     args: { signature: string; address: string; token: string },
     disconnect: () => void,
   ) => void;
-  unicornCookieHandler: (flow: T, wallet: string, cookie: string) => Promise<void>;
+  unicornCookieHandler: (
+    flow: T,
+    wallet: string,
+    cookie: string,
+    siwe: EOAWalletPayload,
+  ) => Promise<void>;
 }
 export default function FamilyWallet<T extends LoginFlow | RegistrationFlow>({
   flow,
   onLogin,
   unicornCookieHandler,
 }: Props<T>) {
-  const { account, signing, setSigning, signature, sign } = useWalletPopup(onLogin);
+  const { account, signing, signature, sign } = useWalletPopup(onLogin);
   const { processing } = useUnicornHandle(flow, unicornCookieHandler);
 
   useEffect(() => {
     if (account.isConnected && !signing && !signature) {
-      setSigning(true);
-
       //-- note: ARC browser will show two signature requests in case of metamask,
       //-- we can set timeout to the sign call if we want to support this browser
       sign();

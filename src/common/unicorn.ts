@@ -3,8 +3,11 @@ import jwtToPem from "jwk-to-pem";
 
 import { getOrSetMemoryCache } from "../utils/cache";
 
+import { EOAWalletPayload } from "./siwe";
+
 export type UnicornAuthCookiePayload = {
   unicorn_auth_cookie: string;
+  siwe: EOAWalletPayload;
 };
 
 export interface AuthCookie {

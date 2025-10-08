@@ -9,10 +9,11 @@ import { useFormContext } from "react-hook-form";
 
 import { handleProfileUpdate } from "../../client/ory";
 import { overridedComponents } from "../../client/ui";
-import { handleUnlinkWallet, handleWalletUpdate } from "../../client/wallet";
+import { handleUnlinkWallet, handleWalletUpdate, useWalletPopup } from "../../client/wallet";
 
 import { type PageProps } from "../../common/types";
-import { useWalletPopup, Web3Provider } from "../../components/family-wallet/web3-provider";
+
+import { Web3Provider } from "../../components/family-wallet/web3-provider";
 import Page from "../../components/page";
 
 const getFlowNodes = (flow: SettingsFlow) => {
@@ -52,7 +53,7 @@ function OidcSettings(props: OrySettingsOidcProps) {
   const { flow, setFlowContainer } = useOryFlow();
   const { setOpen } = useModal();
 
-  const { account, signing, setSigning, signature, sign } = useWalletPopup((args, disconnect) => {
+  const { account, signing, signature, sign } = useWalletPopup((args, disconnect) => {
     disconnect();
 
     handleWalletUpdate({ ...args, flow: flow as SettingsFlow }, (flowWithError, err) => {
@@ -150,8 +151,6 @@ function OidcSettings(props: OrySettingsOidcProps) {
 
   useEffect(() => {
     if (account.isConnected && !signing && !signature && !hasWallet) {
-      setSigning(true);
-
       //-- note: ARC browser will show two signature requests in case of metamask,
       //-- we can set timeout to the sign call if we want to support this browser
       sign();

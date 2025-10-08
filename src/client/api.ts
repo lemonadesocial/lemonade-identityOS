@@ -1,3 +1,5 @@
+import { EOAWalletPayload } from "../common/siwe";
+
 const request = async <T>(uri: string, method: "GET" | "POST" = "GET", body?: any): Promise<T> => {
   const response = await fetch(uri, {
     method,
@@ -21,5 +23,5 @@ export const getUnicornCanLink = (cookie: string) =>
     `/api/unicorn/canlink?auth_cookie=${cookie}`,
   );
 
-export const linkUnicornWallet = (identifier: string, cookie: string) =>
-  request(`/api/unicorn/link`, "POST", { identifier, auth_cookie: cookie });
+export const linkUnicornWallet = (identifier: string, cookie: string, siwe: EOAWalletPayload) =>
+  request(`/api/unicorn/link`, "POST", { identifier, auth_cookie: cookie, siwe });

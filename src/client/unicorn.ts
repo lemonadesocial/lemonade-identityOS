@@ -5,14 +5,16 @@ import { useEffect, useState } from "react";
 import { decodeAuthCookie } from "../common/unicorn";
 
 import { dummyWalletPassword } from "../common/ory";
+import { EOAWalletPayload } from "../common/siwe";
 import { getUnicornCanLink, linkUnicornWallet } from "./api";
 import { handlePasswordLogin, handlePasswordRegistration } from "./ory";
+import { useWalletPopup } from "./wallet";
 
 async function prompt(message: string) {
   return window.confirm(message);
 }
 
-const handleLogin = (flow: LoginFlow, wallet: string, cookie: string) => {
+const handleLogin = (flow: LoginFlow, wallet: string, cookie: string, siwe?: EOAWalletPayload) => {
   handlePasswordLogin(
     {
       flow,
@@ -21,6 +23,7 @@ const handleLogin = (flow: LoginFlow, wallet: string, cookie: string) => {
         password: dummyWalletPassword,
         transient_payload: {
           unicorn_auth_cookie: cookie,
+          siwe,
         },
       },
     },
@@ -41,7 +44,7 @@ const handleLogin = (flow: LoginFlow, wallet: string, cookie: string) => {
   );
 };
 
-export const handleUnicornLogin = async (flow: LoginFlow, wallet: string, cookie: string) => {
+export const handleUnicornLogin = async (flow: LoginFlow, wallet: string, cookie: string, siwe: EOAWalletPayload) => {
   //-- check if the wallet is linkable
   const response = await getUnicornCanLink(cookie);
 
@@ -56,18 +59,19 @@ export const handleUnicornLogin = async (flow: LoginFlow, wallet: string, cookie
 
     if (accept) {
       //-- perform link
-      await linkUnicornWallet(identifier, cookie);
+      await linkUnicornWallet(identifier, cookie, siwe);
     }
   }
 
   //-- perform login anyway
-  handleLogin(flow, wallet, cookie);
+  handleLogin(flow, wallet, cookie, siwe);
 };
 
 export const handleUnicornRegistration = async (
   flow: RegistrationFlow,
   wallet: string,
   cookie: string,
+  siwe: EOAWalletPayload,
 ) => {
   //-- try login first because login is used more
   handlePasswordRegistration(
@@ -80,6 +84,7 @@ export const handleUnicornRegistration = async (
         },
         transient_payload: {
           unicorn_auth_cookie: cookie,
+          siwe,
         },
       },
     },
@@ -92,42 +97,65 @@ export const handleUnicornRegistration = async (
 
 export const useUnicornHandle = <T extends LoginFlow | RegistrationFlow>(
   flow: T,
-  unicornCookieHandler: (flow: T, wallet: string, cookie: string) => Promise<void>,
+  unicornCookieHandler: (flow: T, wallet: string, cookie: string, siwe: EOAWalletPayload) => Promise<void>,
 ) => {
   const [processing, setProcessing] = useState(false);
+  const [authCookie, setAuthCookie] = useState<string>();
+  const [siwe, setSiwe] = useState<EOAWalletPayload>();
 
-  const processAuthCookie = async (cookie: string) => {
-    const authCookie = decodeAuthCookie(cookie);
+  const { signing } = useWalletPopup((args) => setSiwe({
+    wallet_signature: args.signature,
+    wallet_signature_token: args.token,
+  }));
 
-    const walletAddress = authCookie.storedToken.authDetails.walletAddress;
-
-    if (!walletAddress) {
-      alert("This Unicorn wallet is not ready");
-
-      return;
-    }
-
+  const process = async (cookie: string, siwe: EOAWalletPayload) => {
     try {
       setProcessing(true);
-      await unicornCookieHandler(flow, walletAddress, cookie);
-    } finally {
+
+      const authCookie = decodeAuthCookie(cookie);
+
+      const walletAddress = authCookie.storedToken.authDetails.walletAddress;
+
+      if (!walletAddress) {
+        alert("This Unicorn wallet is not ready");
+
+        return;
+      }
+
+      await unicornCookieHandler(flow, walletAddress, cookie, siwe);
+    }
+    finally {
       setProcessing(false);
     }
-  };
+  }
+
+  useEffect(() => {
+    if (authCookie && siwe) {
+      process(authCookie, siwe);
+    }
+  }, [authCookie, siwe]);
 
   useEffect(() => {
     const params = new URL(flow.request_url).searchParams;
 
-    let authCookie = params.get("authCookie");
+    const authCookie = params.get("authCookie");
+    const walletId = params.get("walletId");
 
-    if (!authCookie) {
-      authCookie = new URLSearchParams(window.location.search).get("authCookie");
+    const currentParams = new URLSearchParams(window.location.search);
+
+    if (authCookie && walletId && !currentParams.get("authCookie") && !currentParams.get("walletId")) {
+      const newParams = new URLSearchParams(currentParams);
+
+      newParams.set("authCookie", authCookie);
+      newParams.set("walletId", walletId);
+
+      window.location.href = `${window.location.pathname}?${newParams.toString()}`;
     }
 
     if (authCookie) {
-      processAuthCookie(authCookie);
+      setAuthCookie(authCookie);
     }
   }, [flow.request_url]);
 
-  return { processing };
+  return { processing: processing || signing };
 };
