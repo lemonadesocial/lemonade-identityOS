@@ -99,24 +99,22 @@ export const useUnicornHandle = <T extends LoginFlow | RegistrationFlow>(
 
   useEffect(() => {
     const params = new URL(flow.request_url).searchParams;
+    const currentParams = new URLSearchParams(window.location.search);
 
     const authCookie = params.get("authCookie");
     const walletId = params.get("walletId");
+    const consumed = currentParams.get("consumed");
 
-    const currentParams = new URLSearchParams(window.location.search);
-
-    if (authCookie && walletId && currentParams.get("flow") && !currentParams.get("walletId") && !currentParams.get("authCookie")) {
+    if (!consumed) {
       const newParams = new URLSearchParams(currentParams);
-
-      newParams.set("authCookie", authCookie);
-      newParams.set("walletId", walletId);
-
+      newParams.set("consumed", "true");
+      newParams.set("authCookie", authCookie || "");
+      newParams.set("walletId", walletId || "");
       window.location.href = `${window.location.pathname}?${newParams.toString()}`;
-
-      return;
     }
-
-    setAuthCookie(walletId === 'inApp' ? authCookie || "" : "");
+    else {
+      setAuthCookie(walletId === 'inApp' ? authCookie || "" : "");
+    }
   }, [flow.request_url]);
 
   return { authCookie };
