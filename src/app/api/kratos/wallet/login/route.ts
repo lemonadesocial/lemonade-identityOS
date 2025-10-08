@@ -8,7 +8,7 @@ import {
 import { verifyAuthCookie } from "../../../../../common/unicorn";
 import { verifyFarcasterSIWE } from "../../../../../server/farcaster";
 import { parseRequest, returnError } from "../../../../../server/request";
-import { verifyWalletSignature } from "../../../../../server/wallet";
+import { verifySignerFromSignatureAndToken, verifyWalletSignature } from "../../../../../server/wallet";
 
 export async function POST(request: NextRequest) {
   const { transient_payload, ...bodyRest } = await parseRequest(request);
@@ -35,6 +35,16 @@ export async function POST(request: NextRequest) {
 
     if (authCookie.storedToken.authDetails.walletAddress?.toLowerCase() !== unicorn_wallet) {
       return returnError("Wallet address mismatch");
+    }
+
+    //-- parse data from siwe
+    if (!bodyRest.identity.traits.unicorn_contract_wallet && transient_payload.siwe) {
+      const signer = await verifySignerFromSignatureAndToken(
+        transient_payload.siwe.wallet_signature,
+        transient_payload.siwe.wallet_signature_token,
+      );
+
+      bodyRest.identity.traits.unicorn_contract_wallet = signer;
     }
   } else if (transient_payload && "farcaster_jwt" in transient_payload) {
     if (!farcaster_fid) {

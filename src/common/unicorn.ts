@@ -7,7 +7,7 @@ import { EOAWalletPayload } from "./siwe";
 
 export type UnicornAuthCookiePayload = {
   unicorn_auth_cookie: string;
-  siwe: EOAWalletPayload;
+  siwe?: EOAWalletPayload;
 };
 
 export interface AuthCookie {

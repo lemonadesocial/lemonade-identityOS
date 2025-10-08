@@ -19,7 +19,7 @@ export const parseRequest = async (request: NextRequest) => {
   const payload: {
     identity: {
       id: string;
-      traits: { wallet?: string; email?: string; unicorn_wallet?: string; farcaster_fid?: string };
+      traits: { wallet?: string; email?: string; unicorn_wallet?: string; unicorn_contract_wallet?: string; farcaster_fid?: string };
       metadata_public?: {
         verified_wallet?: string;
         verified_unicorn_wallet?: string;
