@@ -2,7 +2,7 @@
 
 import { LoginFlow, RegistrationFlow } from "@ory/client-fetch";
 import { ConnectKitButton } from "connectkit";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { EOAWalletPayload } from "../../common/siwe";
 
@@ -10,6 +10,7 @@ import { useUnicornHandle } from "../../client/unicorn";
 import { useWalletPopup } from "../../client/wallet";
 
 import Spinner from "./spinner.svg";
+import { decodeAuthCookie } from "../../common/unicorn";
 
 //-- this style is copied from ory default social button theme
 const buttonClassName =
@@ -33,8 +34,20 @@ export default function FamilyWallet<T extends LoginFlow | RegistrationFlow>({
   onLogin,
   unicornCookieHandler,
 }: Props<T>) {
-  const { account, signing, signature, sign } = useWalletPopup(onLogin);
-  const { processing } = useUnicornHandle(flow, unicornCookieHandler);
+  const { authCookie } = useUnicornHandle(flow);
+  const [walletInfo, setWalletInfo] = useState<{
+    siwe: EOAWalletPayload;
+    wallet: string;
+    disconnect: () => void;
+  }>();
+
+  const { account, signing, signature, sign } = useWalletPopup((args, disconnect) => {
+    setWalletInfo({
+      siwe: { wallet_signature: args.signature, wallet_signature_token: args.token },
+      wallet: args.address,
+      disconnect,
+    });
+  });
 
   useEffect(() => {
     if (account.isConnected && !signing && !signature) {
@@ -44,7 +57,38 @@ export default function FamilyWallet<T extends LoginFlow | RegistrationFlow>({
     }
   }, [account.isConnected, signing, signature]);
 
-  const disabled = processing || signing || !!signature;
+  useEffect(() => {
+    if (authCookie !== undefined && walletInfo) {
+      //-- if authCookie is empty then this is normal wallet connect
+      if (!authCookie) {
+        onLogin(
+          {
+            signature: walletInfo.siwe.wallet_signature,
+            address: walletInfo.wallet,
+            token: walletInfo.siwe.wallet_signature_token,
+          },
+          walletInfo.disconnect,
+        );
+
+        return;
+      }
+
+      const { storedToken } = decodeAuthCookie(authCookie);
+      const walletAddress = storedToken.authDetails.walletAddress?.toLowerCase();
+
+      if (!walletAddress) {
+        alert("This Unicorn wallet is not ready");
+
+        return;
+      }
+
+      unicornCookieHandler(flow, walletAddress, authCookie, walletInfo.siwe).catch((err) =>
+        console.log(err),
+      );
+    }
+  }, [authCookie, walletInfo]);
+
+  const disabled = signing || !!signature;
 
   return (
     <ConnectKitButton.Custom>
