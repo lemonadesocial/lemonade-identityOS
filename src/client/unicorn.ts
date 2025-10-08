@@ -103,6 +103,19 @@ export const useUnicornHandle = <T extends LoginFlow | RegistrationFlow>(
     const authCookie = params.get("authCookie");
     const walletId = params.get("walletId");
 
+    const currentParams = new URLSearchParams(window.location.search);
+
+    if (authCookie && walletId && currentParams.get("flow") && !currentParams.get("walletId") && !currentParams.get("authCookie")) {
+      const newParams = new URLSearchParams(currentParams);
+
+      newParams.set("authCookie", authCookie);
+      newParams.set("walletId", walletId);
+
+      window.location.href = `${window.location.pathname}?${newParams.toString()}`;
+
+      return;
+    }
+
     setAuthCookie(walletId === 'inApp' ? authCookie || "" : "");
   }, [flow.request_url]);
 

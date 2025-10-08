@@ -5,12 +5,12 @@ import { ConnectKitButton } from "connectkit";
 import { useEffect, useState } from "react";
 
 import { EOAWalletPayload } from "../../common/siwe";
+import { decodeAuthCookie } from "../../common/unicorn";
 
 import { useUnicornHandle } from "../../client/unicorn";
 import { useWalletPopup } from "../../client/wallet";
 
 import Spinner from "./spinner.svg";
-import { decodeAuthCookie } from "../../common/unicorn";
 
 //-- this style is copied from ory default social button theme
 const buttonClassName =
@@ -50,17 +50,21 @@ export default function FamilyWallet<T extends LoginFlow | RegistrationFlow>({
   });
 
   useEffect(() => {
+    console.log("check to sign", { accountCOnnected: account.isConnected, signing, signature });
     if (account.isConnected && !signing && !signature) {
       //-- note: ARC browser will show two signature requests in case of metamask,
       //-- we can set timeout to the sign call if we want to support this browser
+      console.log("sign here");
       sign();
     }
   }, [account.isConnected, signing, signature]);
 
   useEffect(() => {
+    console.log("effet here", authCookie, walletInfo);
     if (authCookie !== undefined && walletInfo) {
       //-- if authCookie is empty then this is normal wallet connect
       if (!authCookie) {
+        console.log("login here with wallet");
         onLogin(
           {
             signature: walletInfo.siwe.wallet_signature,
@@ -81,6 +85,8 @@ export default function FamilyWallet<T extends LoginFlow | RegistrationFlow>({
 
         return;
       }
+
+      console.log("handle with unicorn", walletAddress, authCookie, walletInfo.siwe);
 
       unicornCookieHandler(flow, walletAddress, authCookie, walletInfo.siwe).catch((err) =>
         console.log(err),
