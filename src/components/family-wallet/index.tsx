@@ -16,18 +16,28 @@ const buttonClassName =
 interface Props<T extends LoginFlow | RegistrationFlow> {
   flow: T;
   onLogin: (
-    args: { signature: string; address: string; token: string },
+    args: {
+      signature: string;
+      address: string;
+      token: string;
+      provider: "wallet" | "unicorn_contract_wallet";
+    },
     disconnect: () => void,
   ) => void;
-  unicornCookieHandler: (flow: T, wallet: string, cookie: string) => Promise<void>;
 }
 export default function FamilyWallet<T extends LoginFlow | RegistrationFlow>({
   flow,
   onLogin,
-  unicornCookieHandler,
 }: Props<T>) {
-  const { account, signing, setSigning, signature, sign } = useWalletPopup(onLogin);
-  const { processing } = useUnicornHandle(flow, unicornCookieHandler);
+  const isUnicorn = useUnicornHandle(flow);
+  const { account, signing, setSigning, signature, sign } = useWalletPopup(
+    (args, disconnect) =>
+      console.log("will call login here with", {
+        ...args,
+        provider: isUnicorn ? "unicorn_contract_wallet" : "wallet",
+      }),
+    // onLogin({ ...args, provider: isUnicorn ? "unicorn_contract_wallet" : "wallet" }, disconnect),
+  );
 
   useEffect(() => {
     if (account.isConnected && !signing && !signature) {
@@ -39,7 +49,7 @@ export default function FamilyWallet<T extends LoginFlow | RegistrationFlow>({
     }
   }, [account.isConnected, signing, signature]);
 
-  const disabled = processing || signing || !!signature;
+  const disabled = signing || !!signature;
 
   return (
     <ConnectKitButton.Custom>

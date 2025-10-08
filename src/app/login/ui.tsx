@@ -7,7 +7,6 @@ import { useEffect } from "react";
 
 import { getCsrfToken } from "../../client/ory";
 import { overridedComponents } from "../../client/ui";
-import { handleUnicornLogin } from "../../client/unicorn";
 import { handleWalletLogin } from "../../client/wallet";
 
 import {
@@ -30,7 +29,6 @@ function OidcButton(props: OryNodeOidcButtonProps) {
   if (value === "family_wallet") {
     return (
       <FamilyWallet
-        unicornCookieHandler={handleUnicornLogin}
         flow={flow as LoginFlow}
         onLogin={(args, disconnect) => {
           disconnect();

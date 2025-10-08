@@ -6,7 +6,6 @@ import { DefaultButtonSocial, DefaultFormContainer, Registration } from "@ory/el
 import { useEffect } from "react";
 
 import { overridedComponents } from "../../client/ui";
-import { handleUnicornRegistration } from "../../client/unicorn";
 import { handleWalletRegistration } from "../../client/wallet";
 import { getCsrfToken } from "../../client/ory";
 
@@ -29,7 +28,6 @@ function OidcButton(props: OryNodeOidcButtonProps) {
   if (value === "family_wallet") {
     return (
       <FamilyWallet
-        unicornCookieHandler={handleUnicornRegistration}
         flow={flow as RegistrationFlow}
         onLogin={(args, disconnect) => {
           disconnect();

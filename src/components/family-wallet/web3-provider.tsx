@@ -60,7 +60,11 @@ export const Web3Provider = ({ children }: { children: React.ReactNode }) => {
 
 export const useWalletPopup = (
   onLogin: (
-    args: { signature: string; address: string; token: string },
+    args: {
+      signature: string;
+      address: string;
+      token: string;
+    },
     disconnect: () => void,
   ) => void,
 ) => {

@@ -14,11 +14,13 @@ export async function handleWalletRegistration(
     signature,
     address,
     token,
+    provider,
   }: {
     flow: RegistrationFlow;
     signature: string;
     address: string;
     token: string;
+    provider?: "wallet" | "unicorn_contract_wallet";
   },
   onError?: (flow: RegistrationFlow, err: unknown) => void,
 ) {
@@ -33,6 +35,7 @@ export async function handleWalletRegistration(
           wallet: lowerCaseAddress,
         },
         transient_payload: {
+          provider,
           wallet_signature: signature,
           wallet_signature_token: token,
         },
@@ -48,11 +51,13 @@ export async function handleWalletLogin(
     signature,
     address,
     token,
+    provider,
   }: {
     flow: LoginFlow;
     signature: string;
     address: string;
     token: string;
+    provider?: "wallet" | "unicorn_contract_wallet";
   },
   onError?: (flow: LoginFlow, err: unknown) => void,
 ) {
@@ -65,6 +70,7 @@ export async function handleWalletLogin(
         identifier: lowerCaseAddress,
         password: dummyWalletPassword,
         transient_payload: {
+          provider,
           wallet_signature: signature,
           wallet_signature_token: token,
         },
