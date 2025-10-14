@@ -8,6 +8,7 @@ export interface Identity {
     email?: string;
     wallet?: string;
     unicorn_wallet?: string;
+    unicorn_contract_wallet?: string;
   };
   credentials?: unknown;
   metadata_public?: Record<string, string>;

@@ -2,9 +2,8 @@ import { LoginFlow, RegistrationFlow } from "@ory/client-fetch";
 import assert from "assert";
 import { useEffect, useState } from "react";
 
-import { decodeAuthCookie } from "../common/unicorn";
-
 import { dummyWalletPassword } from "../common/ory";
+import { EOAWalletPayload } from "../common/siwe";
 import { getUnicornCanLink, linkUnicornWallet } from "./api";
 import { handlePasswordLogin, handlePasswordRegistration } from "./ory";
 
@@ -12,7 +11,7 @@ async function prompt(message: string) {
   return window.confirm(message);
 }
 
-const handleLogin = (flow: LoginFlow, wallet: string, cookie: string) => {
+const handleLogin = (flow: LoginFlow, wallet: string, cookie: string, siwe?: EOAWalletPayload) => {
   handlePasswordLogin(
     {
       flow,
@@ -21,6 +20,7 @@ const handleLogin = (flow: LoginFlow, wallet: string, cookie: string) => {
         password: dummyWalletPassword,
         transient_payload: {
           unicorn_auth_cookie: cookie,
+          siwe,
         },
       },
     },
@@ -41,7 +41,7 @@ const handleLogin = (flow: LoginFlow, wallet: string, cookie: string) => {
   );
 };
 
-export const handleUnicornLogin = async (flow: LoginFlow, wallet: string, cookie: string) => {
+export const handleUnicornLogin = async (flow: LoginFlow, wallet: string, cookie: string, siwe: EOAWalletPayload) => {
   //-- check if the wallet is linkable
   const response = await getUnicornCanLink(cookie);
 
@@ -56,18 +56,19 @@ export const handleUnicornLogin = async (flow: LoginFlow, wallet: string, cookie
 
     if (accept) {
       //-- perform link
-      await linkUnicornWallet(identifier, cookie);
+      await linkUnicornWallet(identifier, cookie, siwe);
     }
   }
 
   //-- perform login anyway
-  handleLogin(flow, wallet, cookie);
+  handleLogin(flow, wallet, cookie, siwe);
 };
 
 export const handleUnicornRegistration = async (
   flow: RegistrationFlow,
   wallet: string,
   cookie: string,
+  siwe: EOAWalletPayload,
 ) => {
   //-- try login first because login is used more
   handlePasswordRegistration(
@@ -80,6 +81,7 @@ export const handleUnicornRegistration = async (
         },
         transient_payload: {
           unicorn_auth_cookie: cookie,
+          siwe,
         },
       },
     },
@@ -92,42 +94,28 @@ export const handleUnicornRegistration = async (
 
 export const useUnicornHandle = <T extends LoginFlow | RegistrationFlow>(
   flow: T,
-  unicornCookieHandler: (flow: T, wallet: string, cookie: string) => Promise<void>,
 ) => {
-  const [processing, setProcessing] = useState(false);
-
-  const processAuthCookie = async (cookie: string) => {
-    const authCookie = decodeAuthCookie(cookie);
-
-    const walletAddress = authCookie.storedToken.authDetails.walletAddress;
-
-    if (!walletAddress) {
-      alert("This Unicorn wallet is not ready");
-
-      return;
-    }
-
-    try {
-      setProcessing(true);
-      await unicornCookieHandler(flow, walletAddress, cookie);
-    } finally {
-      setProcessing(false);
-    }
-  };
+  const [authCookie, setAuthCookie] = useState<string>();
 
   useEffect(() => {
     const params = new URL(flow.request_url).searchParams;
+    const currentParams = new URLSearchParams(window.location.search);
 
-    let authCookie = params.get("authCookie");
+    const authCookie = params.get("authCookie");
+    const walletId = params.get("walletId");
+    const consumed = currentParams.get("consumed");
 
-    if (!authCookie) {
-      authCookie = new URLSearchParams(window.location.search).get("authCookie");
+    if (!consumed) {
+      const newParams = new URLSearchParams(currentParams);
+      newParams.set("consumed", "true");
+      newParams.set("authCookie", authCookie || "");
+      newParams.set("walletId", walletId || "");
+      window.location.href = `${window.location.pathname}?${newParams.toString()}`;
     }
-
-    if (authCookie) {
-      processAuthCookie(authCookie);
+    else {
+      setAuthCookie(walletId === 'inApp' ? authCookie || "" : "");
     }
   }, [flow.request_url]);
 
-  return { processing };
+  return { authCookie };
 };

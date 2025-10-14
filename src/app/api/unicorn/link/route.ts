@@ -2,9 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { dummyWalletPassword } from "../../../../common/ory";
 import { verifyAuthCookie } from "../../../../common/unicorn";
+import { EOAWalletPayload } from "../../../../common/siwe";
 
 import { getUserByIdentifier, updateIdentity } from "../../../../server/ory";
 import { addCorsHeaders } from "../../../../server/request";
+import { verifySignerFromSignatureAndToken } from "../../../../server/wallet";
 
 //-- check if the unicorn authCookie contains credential that can be used to link to existing account
 async function processPost(request: NextRequest) {
@@ -12,8 +14,9 @@ async function processPost(request: NextRequest) {
 
   const identifier: string | undefined = body.identifier;
   const cookie: string | undefined = body.auth_cookie;
+  const siwe: EOAWalletPayload | undefined = body.siwe;
 
-  if (!identifier || !cookie) {
+  if (!identifier || !cookie || !siwe) {
     return new NextResponse("Invalid request", { status: 400 });
   }
 
@@ -41,6 +44,17 @@ async function processPost(request: NextRequest) {
     return new NextResponse("Identity not found", { status: 400 });
   }
 
+  let unicorn_contract_wallet = '';
+
+  if (siwe) {
+    const signer = await verifySignerFromSignatureAndToken(
+      siwe.wallet_signature,
+      siwe.wallet_signature_token,
+    );
+
+    unicorn_contract_wallet = signer;
+  }
+
   //-- we don't update credentials
   const { id, credentials, ...rest } = identity;
 
@@ -49,6 +63,7 @@ async function processPost(request: NextRequest) {
     traits: {
       ...rest.traits,
       unicorn_wallet: wallet,
+      ...(unicorn_contract_wallet && { unicorn_contract_wallet }),
     },
     metadata_public: {
       ...rest.metadata_public,

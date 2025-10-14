@@ -1,6 +1,9 @@
 import { LoginFlow, RegistrationFlow, SettingsFlow } from "@ory/client-fetch";
+import { useEffect, useState } from "react";
+import { useAccount, useDisconnect, useSignMessage } from "wagmi";
 
 import { dummyWalletPassword } from "../common/ory";
+import { getUserWalletRequest } from "./api";
 import {
   handlePasswordLogin,
   handlePasswordRegistration,
@@ -114,3 +117,64 @@ export async function handleUnlinkWallet(
 ) {
   return handleRemoveTraits({ flow, traits: ["wallet"] }, onError);
 }
+
+export const useWalletPopup = (
+  onLogin: (
+    args: { signature: string; address: string; token: string },
+    disconnect: () => void,
+  ) => void,
+) => {
+  const account = useAccount();
+  const { disconnect } = useDisconnect();
+  const { signMessage } = useSignMessage();
+
+  const [signing, setSigning] = useState(false);
+  const [signature, setSignature] = useState("");
+  const [token, setToken] = useState("");
+
+  const sign = async () => {
+    if (!account.address) {
+      return;
+    }
+
+    setSigning(true);
+    setSignature("");
+
+    //-- request payload from backend
+    const data = await getUserWalletRequest(account.address);
+
+    const message = data.message;
+    setToken(data.token);
+
+    signMessage(
+      { message },
+      {
+        onSettled: () => {
+          setSigning(false);
+        },
+        onSuccess: (signature) => {
+          setSignature(signature);
+        },
+        onError: () => {
+          if (account.isConnected) {
+            disconnect();
+          }
+        },
+      },
+    );
+  };
+
+  useEffect(() => {
+    if (signature && account.address && token) {
+      onLogin({ signature, address: account.address, token }, disconnect);
+    }
+  }, [signature, account.address, token]);
+
+  useEffect(() => {
+    if (account.isDisconnected) {
+      setSignature("");
+    }
+  }, [account.isDisconnected]);
+
+  return { account, signing, signature, sign };
+};

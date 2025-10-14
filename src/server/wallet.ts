@@ -1,6 +1,8 @@
 import assert from "assert";
 import { randomBytes, randomUUID } from "crypto";
-import * as ethers from "ethers";
+import { verifySignature } from "thirdweb/auth";
+
+import { client, chain } from "../common/thirdweb";
 
 import { sign, verify } from "../utils/jwt";
 
@@ -53,16 +55,20 @@ export const verifySignerFromSignatureAndToken = async (signature: string, token
     exp: number;
   }>(token, jwtSecret);
 
-  const signer = ethers.verifyMessage(message, signature).toLowerCase();
+  const isValid = await verifySignature({
+    message,
+    signature,
+    address: wallet,
+    client,
+    chain,
+  });
 
-  assert.ok(signer);
-
-  assert.strictEqual(signer, wallet.toLowerCase(), "invalid signature");
+  assert.ok(isValid, "invalid signature");
 
   const replayed = await getRedis().set(`signature:${nonce}`, 1, "EXAT", exp, "GET");
   assert.strictEqual(replayed, null, "signature replayed");
 
-  return signer;
+  return wallet.toLowerCase();
 };
 
 export const verifyWalletSignature = async (
