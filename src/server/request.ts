@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { TransientPayload } from "../common/types";
+import { Identity } from "./ory";
 
 export function addCorsHeaders(response: NextResponse): NextResponse {
   response.headers.set("Access-Control-Allow-Origin", "*");
@@ -17,15 +18,7 @@ export function addCorsHeaders(response: NextResponse): NextResponse {
 
 export const parseRequest = async (request: NextRequest) => {
   const payload: {
-    identity: {
-      id: string;
-      traits: { wallet?: string; email?: string; unicorn_wallet?: string; unicorn_contract_wallet?: string; farcaster_fid?: string };
-      metadata_public?: {
-        verified_wallet?: string;
-        verified_unicorn_wallet?: string;
-        verified_farcaster_fid?: string;
-      };
-    };
+    identity: Identity,
     transient_payload?: TransientPayload;
   } = await request.json();
 
