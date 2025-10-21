@@ -7,6 +7,7 @@ export interface Identity {
   traits: {
     email?: string;
     wallet?: string;
+    farcaster_fid?: string;
     unicorn_wallet?: string;
     unicorn_contract_wallet?: string;
   };
