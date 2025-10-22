@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.7.0](https://github.com/lemonadesocial/lemonade-identityOS/compare/v1.6.0...v1.7.0) (2025-10-21)
+
+
+### Features
+
+* **unicorn:** submit siwe data to extract wallet address ([#38](https://github.com/lemonadesocial/lemonade-identityOS/issues/38)) ([c14fa31](https://github.com/lemonadesocial/lemonade-identityOS/commit/c14fa31f111d21a2be8edbf618715a37b439e098))
+
+
+### Bug Fixes
+
+* **unicorn:** update identity when login with unicorn siwe ([#40](https://github.com/lemonadesocial/lemonade-identityOS/issues/40)) ([7a0c115](https://github.com/lemonadesocial/lemonade-identityOS/commit/7a0c115303fa0e2ce159b4875029e2294e665147))
+
 ## [1.6.0](https://github.com/lemonadesocial/lemonade-identityOS/compare/v1.5.0...v1.6.0) (2025-08-29)
 
 
