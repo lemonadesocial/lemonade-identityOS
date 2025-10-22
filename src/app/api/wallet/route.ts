@@ -16,10 +16,10 @@ export async function GET(request: NextRequest) {
   }
 
   const response = await getWalletMessageWithToken(wallet);
-  return addCorsHeaders(NextResponse.json(response));
+  return addCorsHeaders(request, NextResponse.json(response));
 }
 
-export async function OPTIONS() {
+export async function OPTIONS(request: NextRequest) {
   const response = new NextResponse(null, { status: 200 });
-  return addCorsHeaders(response);
+  return addCorsHeaders(request, response);
 }

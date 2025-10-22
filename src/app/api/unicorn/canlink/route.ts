@@ -43,10 +43,10 @@ async function processGet(request: NextRequest) {
 //-- check if the unicorn authCookie contains credential that can be used to link to existing account
 export async function GET(request: NextRequest) {
   const response = await processGet(request);
-  return addCorsHeaders(response);
+  return addCorsHeaders(request, response);
 }
 
-export async function OPTIONS() {
+export async function OPTIONS(request: NextRequest) {
   const response = new NextResponse(null, { status: 200 });
-  return addCorsHeaders(response);
+  return addCorsHeaders(request, response);
 }
