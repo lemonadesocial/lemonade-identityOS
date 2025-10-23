@@ -6,7 +6,6 @@ import { client, chain } from "../common/thirdweb";
 
 import { sign, verify } from "../utils/jwt";
 
-import { getRedis } from "./redis";
 import { returnError } from "./request";
 
 const getJwtSecret = () => {
@@ -64,9 +63,6 @@ export const verifySignerFromSignatureAndToken = async (signature: string, token
   });
 
   assert.ok(isValid, "invalid signature");
-
-  const replayed = await getRedis().set(`signature:${nonce}`, 1, "EXAT", exp, "GET");
-  assert.strictEqual(replayed, null, "signature replayed");
 
   return wallet.toLowerCase();
 };
