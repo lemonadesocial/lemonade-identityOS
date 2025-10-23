@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.1](https://github.com/lemonadesocial/lemonade-identityOS/compare/v1.7.0...v1.7.1) (2025-10-23)
+
+
+### Bug Fixes
+
+* **unicorn:** sync identity email with unicorn email ([#41](https://github.com/lemonadesocial/lemonade-identityOS/issues/41)) ([5e5109c](https://github.com/lemonadesocial/lemonade-identityOS/commit/5e5109ccad3ed95a8cd1046224e82847b0dd6180))
+
 ## [1.7.0](https://github.com/lemonadesocial/lemonade-identityOS/compare/v1.6.0...v1.7.0) (2025-10-21)
 
 
