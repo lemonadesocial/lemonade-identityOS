@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.2](https://github.com/lemonadesocial/lemonade-identityOS/compare/v1.7.1...v1.7.2) (2025-10-23)
+
+
+### Bug Fixes
+
+* **unicorn:** hide inputs ([#43](https://github.com/lemonadesocial/lemonade-identityOS/issues/43)) ([ab95bfc](https://github.com/lemonadesocial/lemonade-identityOS/commit/ab95bfc1665d05559ed3cd42c2d6be422f0866fd))
+
 ## [1.7.1](https://github.com/lemonadesocial/lemonade-identityOS/compare/v1.7.0...v1.7.1) (2025-10-23)
 
 
