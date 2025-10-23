@@ -38,6 +38,8 @@ export async function POST(request: NextRequest) {
       return returnError("Wallet address mismatch");
     }
 
+    const update: Record<string, string> = {};
+
     //-- parse data from siwe
     if (!bodyRest.identity.traits.unicorn_contract_wallet && transient_payload.siwe) {
       const signer = await verifySignerFromSignatureAndToken(
@@ -45,14 +47,23 @@ export async function POST(request: NextRequest) {
         transient_payload.siwe.wallet_signature_token,
       );
 
+      update.unicorn_contract_wallet = signer;
+    }
+
+    if (!bodyRest.identity.traits.email && authCookie.storedToken.authDetails.email) {
+      update.email = authCookie.storedToken.authDetails.email.toLowerCase();
+    }
+
+    if (Object.keys(update).length > 0) {
       await updateIdentity(bodyRest.identity.id, {
         ...bodyRest.identity,
         traits: {
           ...bodyRest.identity.traits,
-          unicorn_contract_wallet: signer,
+          ...update,
         },
       });
     }
+
   } else if (transient_payload && "farcaster_jwt" in transient_payload) {
     if (!farcaster_fid) {
       return returnError("Farcaster FID is required");
