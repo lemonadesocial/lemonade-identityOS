@@ -62,6 +62,22 @@ export async function POST(request: NextRequest) {
       bodyRest.identity.traits.unicorn_contract_wallet = signer;
     }
 
+    const email = authCookie.storedToken.authDetails.email?.toLowerCase();
+
+    if (email && !bodyRest.identity.traits.email) {
+      bodyRest.identity.traits.email = email;
+
+      bodyRest.identity.verifiable_addresses = [
+        ...bodyRest.identity.verifiable_addresses || [],
+        {
+          value: email,
+          verified: true,
+          via: "email",
+          status: "completed",
+        } as any,
+      ]
+    }
+
     metadata_public.verified_unicorn_wallet = unicorn_wallet;
   }
 

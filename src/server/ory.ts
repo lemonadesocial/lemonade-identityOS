@@ -13,7 +13,7 @@ export interface Identity {
   };
   credentials?: unknown;
   metadata_public?: Record<string, string>;
-  verifiable_addresses: {
+  verifiable_addresses?: {
     id: string;
     value: string;
     verified: boolean;

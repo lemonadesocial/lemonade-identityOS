@@ -103,7 +103,7 @@ async function processPost(request: NextRequest) {
       },
       ...(newEmail !== payload.traits.email && {
         verifiable_addresses: [
-          ...payload.verifiable_addresses,
+          ...payload.verifiable_addresses || [],
           {
             value: email,
             verified: true,
