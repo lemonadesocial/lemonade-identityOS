@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.8.0](https://github.com/lemonadesocial/lemonade-identityOS/compare/v1.7.2...v1.8.0) (2026-01-01)
+
+
+### Features
+
+* **unicorn:** require siwe payload when login & signup ([#49](https://github.com/lemonadesocial/lemonade-identityOS/issues/49)) ([404bf14](https://github.com/lemonadesocial/lemonade-identityOS/commit/404bf142d82765eac8054ed5d9cd15deb006dc77))
+
+
+### Bug Fixes
+
+* **unicorn:** require siwe in all routes ([#51](https://github.com/lemonadesocial/lemonade-identityOS/issues/51)) ([33d6d90](https://github.com/lemonadesocial/lemonade-identityOS/commit/33d6d9027899dc5f0a1948f148266c09749243f1))
+* **unicorn:** require siwe in all routes ([#52](https://github.com/lemonadesocial/lemonade-identityOS/issues/52)) ([f2f8c11](https://github.com/lemonadesocial/lemonade-identityOS/commit/f2f8c114280cd43f05aee5c33320f4b35a91385b))
+
 ## [1.7.2](https://github.com/lemonadesocial/lemonade-identityOS/compare/v1.7.1...v1.7.2) (2025-10-23)
 
 
