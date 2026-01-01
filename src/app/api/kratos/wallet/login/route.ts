@@ -41,7 +41,11 @@ export async function POST(request: NextRequest) {
     const update: Record<string, unknown> = {};
 
     //-- parse data from siwe
-    if (!bodyRest.identity.traits.unicorn_contract_wallet && transient_payload.siwe) {
+    if (!bodyRest.identity.traits.unicorn_contract_wallet) {
+      if (!transient_payload.siwe) {
+        return returnError("Signature not found");
+      }
+
       const signer = await verifySignerFromSignatureAndToken(
         transient_payload.siwe.wallet_signature,
         transient_payload.siwe.wallet_signature_token,
