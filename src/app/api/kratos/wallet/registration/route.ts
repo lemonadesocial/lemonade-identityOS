@@ -25,6 +25,10 @@ export async function POST(request: NextRequest) {
   const metadata_public: Record<string, string> = {};
 
   if (transient_payload && "unicorn_auth_cookie" in transient_payload) {
+    if (!transient_payload.siwe) {
+      return returnError("Signature not found");
+    }
+
     if (!unicorn_wallet) {
       return returnError("Unicorn wallet is required");
     }
@@ -41,18 +45,12 @@ export async function POST(request: NextRequest) {
     }
 
     //-- parse data from siwe
-    if (!bodyRest.identity.traits.unicorn_contract_wallet) {
-      if (!transient_payload.siwe) {
-        return returnError("Signature not found");
-      }
+    const signer = await verifySignerFromSignatureAndToken(
+      transient_payload.siwe.wallet_signature,
+      transient_payload.siwe.wallet_signature_token,
+    );
 
-      const signer = await verifySignerFromSignatureAndToken(
-        transient_payload.siwe.wallet_signature,
-        transient_payload.siwe.wallet_signature_token,
-      );
-
-      bodyRest.identity.traits.unicorn_contract_wallet = signer;
-    }
+    bodyRest.identity.traits.unicorn_contract_wallet = signer;
 
     const email = authCookie.storedToken.authDetails.email?.toLowerCase();
 
