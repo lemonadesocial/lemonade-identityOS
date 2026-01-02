@@ -38,7 +38,8 @@ export async function POST(request: NextRequest) {
       return returnError("Wallet address mismatch");
     }
 
-    const update: Record<string, unknown> = {};
+    const identityUpdate: Record<string, unknown> = {};
+    const traitUpdate: Record<string, unknown> = {};
 
     //-- parse data from siwe
     if (!bodyRest.identity.traits.unicorn_contract_wallet && transient_payload.siwe) {
@@ -47,15 +48,15 @@ export async function POST(request: NextRequest) {
         transient_payload.siwe.wallet_signature_token,
       );
 
-      update.unicorn_contract_wallet = signer;
+      traitUpdate.unicorn_contract_wallet = signer;
     }
 
     const email = authCookie.storedToken.authDetails.email?.toLowerCase();
 
     if (!bodyRest.identity.traits.email && email) {
-      update.email = email;
+      traitUpdate.email = email;
 
-      update.verifiable_addresses = [
+      identityUpdate.verifiable_addresses = [
         ...(bodyRest.identity.verifiable_addresses || []),
         {
           value: email,
@@ -66,12 +67,13 @@ export async function POST(request: NextRequest) {
       ]
     }
 
-    if (Object.keys(update).length > 0) {
+    if (Object.keys(traitUpdate).length > 0 || Object.keys(identityUpdate).length > 0) {
       await updateIdentity(bodyRest.identity.id, {
         ...bodyRest.identity,
+        ...identityUpdate,
         traits: {
           ...bodyRest.identity.traits,
-          ...update,
+          ...traitUpdate,
         },
       });
     }
