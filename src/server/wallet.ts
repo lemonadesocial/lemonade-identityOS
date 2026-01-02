@@ -1,12 +1,11 @@
 import assert from "assert";
 import { randomBytes, randomUUID } from "crypto";
 import { verifySignature } from "thirdweb/auth";
+import * as ethers from "ethers";
 
 import { client, chain } from "../common/thirdweb";
 
 import { sign, verify } from "../utils/jwt";
-
-import { returnError } from "./request";
 
 const getJwtSecret = () => {
   const jwtSecret = process.env.JWT_SECRET;
@@ -47,7 +46,7 @@ export const getWalletMessageWithToken = async (wallet: string) => {
 export const verifySignerFromSignatureAndToken = async (signature: string, token: string) => {
   const jwtSecret = getJwtSecret();
 
-  const { wallet, nonce, message, exp } = await verify<{
+  const { wallet, message } = await verify<{
     wallet: string;
     nonce: string;
     message: string;
@@ -67,14 +66,19 @@ export const verifySignerFromSignatureAndToken = async (signature: string, token
   return wallet.toLowerCase();
 };
 
-export const verifyWalletSignature = async (
-  wallet: string,
-  wallet_signature: string,
-  wallet_signature_token: string,
-) => {
-  const signer = await verifySignerFromSignatureAndToken(wallet_signature, wallet_signature_token);
+export const verifyEOASignature = async (signature: string, token: string) => {
+  const jwtSecret = getJwtSecret();
 
-  if (signer.toLowerCase() !== wallet) {
-    return returnError("Invalid wallet signature");
-  }
-};
+  const { wallet, message } = await verify<{
+    wallet: string;
+    nonce: string;
+    message: string;
+    exp: number;
+  }>(token, jwtSecret);
+
+  const signer = ethers.verifyMessage(message, signature).toLowerCase();
+
+  assert.strictEqual(signer, wallet.toLowerCase(), "invalid signature");
+
+  return signer;
+}

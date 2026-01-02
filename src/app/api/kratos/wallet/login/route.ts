@@ -8,7 +8,7 @@ import {
 import { verifyAuthCookie } from "../../../../../common/unicorn";
 import { verifyFarcasterSIWE } from "../../../../../server/farcaster";
 import { parseRequest, returnError } from "../../../../../server/request";
-import { verifySignerFromSignatureAndToken, verifyWalletSignature } from "../../../../../server/wallet";
+import { verifyEOASignature, verifySignerFromSignatureAndToken } from "../../../../../server/wallet";
 import { updateIdentity } from "../../../../../server/ory";
 
 export async function POST(request: NextRequest) {
@@ -16,6 +16,7 @@ export async function POST(request: NextRequest) {
 
   const wallet = bodyRest.identity.traits.wallet?.toLowerCase();
   const unicorn_wallet = bodyRest.identity.traits.unicorn_wallet?.toLowerCase();
+  const unicorn_contract_wallet = bodyRest.identity.traits.unicorn_contract_wallet?.toLowerCase();
   const farcaster_fid = bodyRest.identity.traits.farcaster_fid?.toLowerCase();
 
   if (!wallet && !unicorn_wallet && !farcaster_fid) {
@@ -23,6 +24,10 @@ export async function POST(request: NextRequest) {
   }
 
   if (transient_payload && "unicorn_auth_cookie" in transient_payload) {
+    if (!transient_payload.siwe) {
+      return returnError("Signature not found");
+    }
+
     if (!unicorn_wallet) {
       return returnError("Unicorn wallet is required");
     }
@@ -38,24 +43,25 @@ export async function POST(request: NextRequest) {
       return returnError("Wallet address mismatch");
     }
 
-    const update: Record<string, unknown> = {};
+    const traitUpdate: Record<string, unknown> = {};
+    const identityUpdate: Record<string, unknown> = {};
 
     //-- parse data from siwe
-    if (!bodyRest.identity.traits.unicorn_contract_wallet && transient_payload.siwe) {
-      const signer = await verifySignerFromSignatureAndToken(
-        transient_payload.siwe.wallet_signature,
-        transient_payload.siwe.wallet_signature_token,
-      );
+    const signer = await verifySignerFromSignatureAndToken(
+      transient_payload.siwe.wallet_signature,
+      transient_payload.siwe.wallet_signature_token,
+    );
 
-      update.unicorn_contract_wallet = signer;
+    if (signer !== unicorn_contract_wallet) {
+      traitUpdate.unicorn_contract_wallet = signer;
     }
 
     const email = authCookie.storedToken.authDetails.email?.toLowerCase();
 
     if (!bodyRest.identity.traits.email && email) {
-      update.email = email;
+      traitUpdate.email = email;
 
-      update.verifiable_addresses = [
+      identityUpdate.verifiable_addresses = [
         ...(bodyRest.identity.verifiable_addresses || []),
         {
           value: email,
@@ -66,12 +72,13 @@ export async function POST(request: NextRequest) {
       ]
     }
 
-    if (Object.keys(update).length > 0) {
+    if (Object.keys(traitUpdate).length > 0 || Object.keys(identityUpdate).length > 0) {
       await updateIdentity(bodyRest.identity.id, {
         ...bodyRest.identity,
+        ...identityUpdate,
         traits: {
           ...bodyRest.identity.traits,
-          ...update,
+          ...traitUpdate,
         },
       });
     }
@@ -94,8 +101,7 @@ export async function POST(request: NextRequest) {
       return returnError("Wallet is required");
     }
 
-    await verifyWalletSignature(
-      wallet,
+    await verifyEOASignature(
       transient_payload.wallet_signature,
       transient_payload.wallet_signature_token,
     );
@@ -113,5 +119,5 @@ export async function POST(request: NextRequest) {
     return returnError("Missing required transient payload");
   }
 
-  return NextResponse.json(bodyRest);
+  return NextResponse.json({});
 }
