@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.1](https://github.com/lemonadesocial/lemonade-identityOS/compare/v1.8.0...v1.8.1) (2026-01-02)
+
+
+### Bug Fixes
+
+* **unicorn:** fix login hook update identity ([#53](https://github.com/lemonadesocial/lemonade-identityOS/issues/53)) ([726eb0f](https://github.com/lemonadesocial/lemonade-identityOS/commit/726eb0fe7114887bece7c8fbc7fbfd9f5588e8a9))
+
 ## [1.8.0](https://github.com/lemonadesocial/lemonade-identityOS/compare/v1.7.2...v1.8.0) (2026-01-01)
 
 
