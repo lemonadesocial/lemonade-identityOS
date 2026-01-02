@@ -16,7 +16,6 @@ export async function POST(request: NextRequest) {
 
   const wallet = bodyRest.identity.traits.wallet?.toLowerCase();
   const unicorn_wallet = bodyRest.identity.traits.unicorn_wallet?.toLowerCase();
-  const unicorn_contract_wallet = bodyRest.identity.traits.unicorn_contract_wallet?.toLowerCase();
   const farcaster_fid = bodyRest.identity.traits.farcaster_fid?.toLowerCase();
 
   if (!wallet && !unicorn_wallet && !farcaster_fid) {
@@ -24,10 +23,6 @@ export async function POST(request: NextRequest) {
   }
 
   if (transient_payload && "unicorn_auth_cookie" in transient_payload) {
-    if (!transient_payload.siwe) {
-      return returnError("Signature not found");
-    }
-
     if (!unicorn_wallet) {
       return returnError("Unicorn wallet is required");
     }
@@ -43,16 +38,16 @@ export async function POST(request: NextRequest) {
       return returnError("Wallet address mismatch");
     }
 
-    const traitUpdate: Record<string, unknown> = {};
     const identityUpdate: Record<string, unknown> = {};
+    const traitUpdate: Record<string, unknown> = {};
 
     //-- parse data from siwe
-    const signer = await verifySignerFromSignatureAndToken(
-      transient_payload.siwe.wallet_signature,
-      transient_payload.siwe.wallet_signature_token,
-    );
+    if (!bodyRest.identity.traits.unicorn_contract_wallet && transient_payload.siwe) {
+      const signer = await verifySignerFromSignatureAndToken(
+        transient_payload.siwe.wallet_signature,
+        transient_payload.siwe.wallet_signature_token,
+      );
 
-    if (signer !== unicorn_contract_wallet) {
       traitUpdate.unicorn_contract_wallet = signer;
     }
 

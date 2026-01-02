@@ -54,16 +54,14 @@ export async function POST(request: NextRequest) {
       return returnError("Wallet address mismatch");
     }
 
-    if (!transient_payload.siwe) {
-      return returnError("Signature not found");
+    if (transient_payload.siwe) {
+      const signer = await verifySignerFromSignatureAndToken(
+        transient_payload.siwe.wallet_signature,
+        transient_payload.siwe.wallet_signature_token,
+      );
+
+      bodyRest.identity.traits.unicorn_contract_wallet = signer;
     }
-
-    const signer = await verifySignerFromSignatureAndToken(
-      transient_payload.siwe.wallet_signature,
-      transient_payload.siwe.wallet_signature_token,
-    );
-
-    bodyRest.identity.traits.unicorn_contract_wallet = signer;
 
     const email = authCookie.storedToken.authDetails.email?.toLowerCase();
 
