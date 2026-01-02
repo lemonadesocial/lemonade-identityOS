@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.2](https://github.com/lemonadesocial/lemonade-identityOS/compare/v1.8.1...v1.8.2) (2026-01-02)
+
+
+### Bug Fixes
+
+* fix update identity when login ([#57](https://github.com/lemonadesocial/lemonade-identityOS/issues/57)) ([1972c16](https://github.com/lemonadesocial/lemonade-identityOS/commit/1972c165f570658237fd348214a7456dbb05b5d9))
+
 ## [1.7.2](https://github.com/lemonadesocial/lemonade-identityOS/compare/v1.7.1...v1.7.2) (2025-10-23)
 
 
