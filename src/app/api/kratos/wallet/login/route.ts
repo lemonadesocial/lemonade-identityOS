@@ -16,7 +16,6 @@ export async function POST(request: NextRequest) {
 
   const wallet = bodyRest.identity.traits.wallet?.toLowerCase();
   const unicorn_wallet = bodyRest.identity.traits.unicorn_wallet?.toLowerCase();
-  const unicorn_contract_wallet = bodyRest.identity.traits.unicorn_contract_wallet?.toLowerCase();
   const farcaster_fid = bodyRest.identity.traits.farcaster_fid?.toLowerCase();
 
   if (!wallet && !unicorn_wallet && !farcaster_fid) {
@@ -24,10 +23,6 @@ export async function POST(request: NextRequest) {
   }
 
   if (transient_payload && "unicorn_auth_cookie" in transient_payload) {
-    if (!transient_payload.siwe) {
-      return returnError("Signature not found");
-    }
-
     if (!unicorn_wallet) {
       return returnError("Unicorn wallet is required");
     }
@@ -43,25 +38,24 @@ export async function POST(request: NextRequest) {
       return returnError("Wallet address mismatch");
     }
 
-    const traitUpdate: Record<string, unknown> = {};
-    const identityUpdate: Record<string, unknown> = {};
+    const update: Record<string, unknown> = {};
 
     //-- parse data from siwe
-    const signer = await verifySignerFromSignatureAndToken(
-      transient_payload.siwe.wallet_signature,
-      transient_payload.siwe.wallet_signature_token,
-    );
+    if (!bodyRest.identity.traits.unicorn_contract_wallet && transient_payload.siwe) {
+      const signer = await verifySignerFromSignatureAndToken(
+        transient_payload.siwe.wallet_signature,
+        transient_payload.siwe.wallet_signature_token,
+      );
 
-    if (signer !== unicorn_contract_wallet) {
-      traitUpdate.unicorn_contract_wallet = signer;
+      update.unicorn_contract_wallet = signer;
     }
 
     const email = authCookie.storedToken.authDetails.email?.toLowerCase();
 
     if (!bodyRest.identity.traits.email && email) {
-      traitUpdate.email = email;
+      update.email = email;
 
-      identityUpdate.verifiable_addresses = [
+      update.verifiable_addresses = [
         ...(bodyRest.identity.verifiable_addresses || []),
         {
           value: email,
@@ -72,13 +66,12 @@ export async function POST(request: NextRequest) {
       ]
     }
 
-    if (Object.keys(traitUpdate).length > 0 || Object.keys(identityUpdate).length > 0) {
+    if (Object.keys(update).length > 0) {
       await updateIdentity(bodyRest.identity.id, {
         ...bodyRest.identity,
-        ...identityUpdate,
         traits: {
           ...bodyRest.identity.traits,
-          ...traitUpdate,
+          ...update,
         },
       });
     }
