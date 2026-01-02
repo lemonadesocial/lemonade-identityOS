@@ -40,15 +40,17 @@ export async function POST(request: NextRequest) {
       return returnError("Wallet address mismatch");
     }
 
-    //-- parse data from siwe
-    if (!bodyRest.identity.traits.unicorn_contract_wallet && transient_payload.siwe) {
-      const signer = await verifySignerFromSignatureAndToken(
-        transient_payload.siwe.wallet_signature,
-        transient_payload.siwe.wallet_signature_token,
-      );
-
-      bodyRest.identity.traits.unicorn_contract_wallet = signer;
+    if (!transient_payload.siwe) {
+      return returnError("No wallet signature");
     }
+
+    //-- parse data from siwe
+    const signer = await verifySignerFromSignatureAndToken(
+      transient_payload.siwe.wallet_signature,
+      transient_payload.siwe.wallet_signature_token,
+    );
+
+    bodyRest.identity.traits.unicorn_contract_wallet = signer;
 
     const email = authCookie.storedToken.authDetails.email?.toLowerCase();
 
