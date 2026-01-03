@@ -1,5 +1,5 @@
 import { createOryMiddleware } from "@ory/nextjs/middleware";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 import oryConfig from "../ory.config";
 
@@ -10,26 +10,31 @@ export const oryMiddleware = createOryMiddleware({
 });
 
 export const middleware = async (request: NextRequest) => {
-  const p = request.nextUrl.pathname;
+  // const p = request.nextUrl.pathname;
 
-  console.log("middle intercepting request", request.url);
+  // console.log("middle intercepting request", request.url);
 
-  const forwardedHost = request.headers.get("x-forwarded-host");
-  request.nextUrl.host = forwardedHost || request.nextUrl.host;
-  request.nextUrl.port = forwardedHost ? request.headers.get("x-forwarded-port") || '' : request.nextUrl.port;
+  // const forwardedHost = request.headers.get("x-forwarded-host");
+  // request.nextUrl.host = forwardedHost || request.nextUrl.host;
+  // request.nextUrl.port = forwardedHost ? request.headers.get("x-forwarded-port") || '' : request.nextUrl.port;
 
-  const res = await oryMiddleware(request);
+  // const res = await oryMiddleware(request);
 
-  console.log(
-    "[mw] OUT",
-    request.method,
-    p,
-    "status=",
-    res.status,
-    "location=",
-    res.headers.get("location"),
-  );
+  // console.log(
+  //   "[mw] OUT",
+  //   request.method,
+  //   p,
+  //   "status=",
+  //   res.status,
+  //   "location=",
+  //   res.headers.get("location"),
+  // );
 
+  // return res;
+
+  const res = NextResponse.next();
+  res.headers.set("x-mw-stamp", "1");
+  res.headers.set("x-mw-path", request.nextUrl.pathname);
   return res;
 };
 
