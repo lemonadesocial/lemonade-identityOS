@@ -9,15 +9,28 @@ export const oryMiddleware = createOryMiddleware({
   forceCookieDomain: process.env.NEXT_PUBLIC_COOKIE_DOMAIN,
 });
 
-export const middleware = (request: NextRequest) => {
+export const middleware = async (request: NextRequest) => {
+  const p = request.nextUrl.pathname;
+
   console.log("middle intercepting request", request.url);
 
   const forwardedHost = request.headers.get("x-forwarded-host");
   request.nextUrl.host = forwardedHost || request.nextUrl.host;
   request.nextUrl.port = forwardedHost ? request.headers.get("x-forwarded-port") || '' : request.nextUrl.port;
 
-  console.log('return oryMiddleware');
-  return oryMiddleware(request);
+  const res = await oryMiddleware(request);
+
+  console.log(
+    "[mw] OUT",
+    request.method,
+    p,
+    "status=",
+    res.status,
+    "location=",
+    res.headers.get("location"),
+  );
+
+  return res;
 };
 
 // See "Matching Paths" below to learn more
