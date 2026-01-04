@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.9.0](https://github.com/lemonadesocial/lemonade-identityOS/compare/v1.8.2...v1.9.0) (2026-01-04)
+
+
+### Features
+
+* pump next version ([3767ba5](https://github.com/lemonadesocial/lemonade-identityOS/commit/3767ba51c52aa32a3020097047ac43633d6ddda3))
+
+
+### Bug Fixes
+
+* bind on 0.0.0.0 ([55fa3b6](https://github.com/lemonadesocial/lemonade-identityOS/commit/55fa3b6f8471912bb1411820f101caecce93fb73))
+* fix middleware ([f41d47f](https://github.com/lemonadesocial/lemonade-identityOS/commit/f41d47f75fcc725cbfd511c0c419e25bf8daf56f))
+* update base URL ([25ef0dc](https://github.com/lemonadesocial/lemonade-identityOS/commit/25ef0dca1cc1b967f8fcfe1f6f25fb23cfbb967f))
+* use client for web3 provider ([22b7fea](https://github.com/lemonadesocial/lemonade-identityOS/commit/22b7fea1f27b3e4c23adf9ab2a1b06d8f30d4e2c))
+
 ## [1.8.2](https://github.com/lemonadesocial/lemonade-identityOS/compare/v1.8.1...v1.8.2) (2026-01-02)
 
 
