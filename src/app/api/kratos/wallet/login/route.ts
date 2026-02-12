@@ -101,6 +101,40 @@ export async function POST(request: NextRequest) {
       transient_payload.wallet_signature,
       transient_payload.wallet_signature_token,
     );
+  } else if (transient_payload && "x402_payment_header" in transient_payload) {
+    if (!wallet) {
+      return returnError("Wallet is required");
+    }
+
+    const response = await fetch(
+      `${process.env.LEMONADE_AI_ADMIN_URL}/verify-x402-payment`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          x402_payment_header: transient_payload.x402_payment_header,
+        }),
+      },
+    );
+
+    if (!response.ok) {
+      return returnError("Failed to verify x402 payment header");
+    }
+
+    const { from, valid, validAfter } = (await response.json()) as { from: string; valid: boolean; validAfter: number };
+
+    if (!valid) {
+      return returnError("Invalid x402 payment header");
+    }
+
+    if (from.toLowerCase() !== wallet) {
+      return returnError("x402 payer wallet mismatch");
+    }
+
+    const fiveMinutesAgo = Math.floor(Date.now() / 1000) - 5 * 60;
+    if (validAfter < fiveMinutesAgo) {
+      return returnError("x402 payment header expired");
+    }
   } else if (transient_payload && "farcaster_siwe_message" in transient_payload) {
     if (!farcaster_fid) {
       return returnError("Farcaster FID is not found");

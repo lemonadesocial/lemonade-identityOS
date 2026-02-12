@@ -8,8 +8,13 @@ export interface PageProps {
   config: OryClientConfiguration;
 }
 
+export type X402PaymentPayload = {
+  x402_payment_header: string;
+};
+
 export type TransientPayload =
   | FarcasterSiwePayload
   | FarcasterJwtPayload
   | EOAWalletPayload
-  | UnicornAuthCookiePayload;
+  | UnicornAuthCookiePayload
+  | X402PaymentPayload;
