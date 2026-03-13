@@ -62,6 +62,7 @@ function RegistrationFormRoot(props: any) {
         "traits.unicorn_wallet",
         "traits.farcaster_fid",
         "traits.unicorn_contract_wallet",
+        "traits.near_wallet",
       ].includes((node.attributes as UiNodeInputAttributes).name) && node.group !== "password",
   );
 

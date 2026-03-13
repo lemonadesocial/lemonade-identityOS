@@ -58,6 +58,7 @@ export function getFlowWithSomeInputsHidden(flow: RegistrationFlow) {
             "traits.wallet",
             "traits.unicorn_wallet",
             "traits.farcaster_fid",
+            "traits.near_wallet",
           ].includes((node.attributes as UiNodeInputAttributes).name) && node.group !== "password",
       ),
     },

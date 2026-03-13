@@ -6,7 +6,7 @@ import { parseRequest } from "../../../../server/request";
 export async function POST(request: NextRequest) {
   const { identity } = await parseRequest(request);
 
-  if (identity.traits.farcaster_fid || identity.traits.unicorn_wallet || identity.traits.wallet) {
+  if (identity.traits.farcaster_fid || identity.traits.unicorn_wallet || identity.traits.wallet || identity.traits.near_wallet) {
     await ensurePasswordAuth(identity.id);
   }
 

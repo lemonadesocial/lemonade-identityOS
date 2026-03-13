@@ -7,6 +7,7 @@ import {
 } from "../../../../../common/farcaster";
 import { verifyAuthCookie } from "../../../../../common/unicorn";
 import { verifyFarcasterSIWE } from "../../../../../server/farcaster";
+import { verifyNearWalletSignature } from "../../../../../server/near-wallet";
 import { parseRequest, returnError } from "../../../../../server/request";
 import { verifySignerFromSignatureAndToken, verifyWalletSignature } from "../../../../../server/wallet";
 import { updateIdentity } from "../../../../../server/ory";
@@ -17,8 +18,9 @@ export async function POST(request: NextRequest) {
   const wallet = bodyRest.identity.traits.wallet?.toLowerCase();
   const unicorn_wallet = bodyRest.identity.traits.unicorn_wallet?.toLowerCase();
   const farcaster_fid = bodyRest.identity.traits.farcaster_fid?.toLowerCase();
+  const near_wallet = bodyRest.identity.traits.near_wallet?.toLowerCase();
 
-  if (!wallet && !unicorn_wallet && !farcaster_fid) {
+  if (!wallet && !unicorn_wallet && !farcaster_fid && !near_wallet) {
     return returnError("Password login for email is disabled");
   }
 
@@ -111,6 +113,16 @@ export async function POST(request: NextRequest) {
     if (userFID !== farcaster_fid) {
       return returnError("Invalid farcaster payload");
     }
+  } else if (transient_payload && "near_wallet_signature" in transient_payload) {
+    if (!near_wallet) {
+      return returnError("NEAR wallet is required");
+    }
+
+    await verifyNearWalletSignature(
+      near_wallet,
+      transient_payload.near_wallet_signature,
+      transient_payload.near_wallet_signature_token,
+    );
   } else {
     return returnError("Missing required transient payload");
   }

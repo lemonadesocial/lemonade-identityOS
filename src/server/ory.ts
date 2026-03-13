@@ -10,6 +10,7 @@ export interface Identity {
     farcaster_fid?: string;
     unicorn_wallet?: string;
     unicorn_contract_wallet?: string;
+    near_wallet?: string;
   };
   credentials?: unknown;
   metadata_public?: Record<string, string>;

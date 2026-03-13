@@ -4,6 +4,7 @@ import { getFarcasterIdentifier, verifyJwt } from "../../../../../common/farcast
 import { verifyAuthCookie } from "../../../../../common/unicorn";
 
 import { verifyFarcasterSIWE } from "../../../../../server/farcaster";
+import { verifyNearWalletSignature } from "../../../../../server/near-wallet";
 import { parseRequest, returnError } from "../../../../../server/request";
 import { verifySignerFromSignatureAndToken, verifyWalletSignature } from "../../../../../server/wallet";
 
@@ -16,7 +17,9 @@ export async function POST(request: NextRequest) {
   const email = bodyRest.identity.traits.email;
   const farcaster_fid = bodyRest.identity.traits.farcaster_fid;
 
-  if (!wallet && !unicorn_wallet && !farcaster_fid && !email) {
+  const near_wallet = bodyRest.identity.traits.near_wallet?.toLowerCase();
+
+  if (!wallet && !unicorn_wallet && !farcaster_fid && !near_wallet && !email) {
     return returnError("Missing required identifier");
   }
 
@@ -104,6 +107,23 @@ export async function POST(request: NextRequest) {
     } else {
       return returnError("Missing required transient payload");
     }
+  }
+
+  if (
+    near_wallet &&
+    near_wallet !== bodyRest.identity.metadata_public?.verified_near_wallet
+  ) {
+    if (!transient_payload || !("near_wallet_signature" in transient_payload)) {
+      return returnError("Missing required transient payload");
+    }
+
+    await verifyNearWalletSignature(
+      near_wallet,
+      transient_payload.near_wallet_signature,
+      transient_payload.near_wallet_signature_token,
+    );
+
+    metadata_public.verified_near_wallet = near_wallet;
   }
 
   return NextResponse.json({

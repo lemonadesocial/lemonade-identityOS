@@ -21,7 +21,7 @@ const getFlowNodes = (flow: SettingsFlow) => {
     if (
       node.group === "profile" &&
       "name" in node.attributes &&
-      ["traits.wallet", "traits.unicorn_wallet", "traits.unicorn_contract_wallet"].includes(
+      ["traits.wallet", "traits.unicorn_wallet", "traits.unicorn_contract_wallet", "traits.near_wallet"].includes(
         node.attributes.name,
       )
     ) {
