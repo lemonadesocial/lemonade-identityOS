@@ -1,53 +1,372 @@
-:root {
-  /* constants */
-  --white: #fdfdfd;
-  --white-alt: #f5f5f5;
-  --black: #101010;
-  --black-alt: #202020;
-  --accent: #a667f3;
+:root,
+.dark,
+[data-theme="dark"] {
+  color-scheme: dark;
 
-  /* variables */
-  --text-primary: var(--black);
-  --background-primary: var(--white);
-  --background-secondary: var(--white-alt);
-  --border-primary: var(--white-alt);
+  --color-woodsmoke-50: #f7f7f8;
+  --color-woodsmoke-100: #eeedf1;
+  --color-woodsmoke-200: #d9d8df;
+  --color-woodsmoke-300: #b8b5c4;
+  --color-woodsmoke-400: #918da3;
+  --color-woodsmoke-500: #736f88;
+  --color-woodsmoke-600: #5e5970;
+  --color-woodsmoke-700: #4c495b;
+  --color-woodsmoke-800: #423f4d;
+  --color-woodsmoke-900: #393743;
+  --color-woodsmoke-950: #141317;
 
-  /* root styles */
-  color: var(--text-primary);
+  --color-background: var(--color-woodsmoke-950);
+  --color-page-background-overlay: rgba(20, 19, 23, 0.8);
+
+  --color-primary: #ffffff;
+  --color-primary-invert: #000000;
+  --color-secondary: rgba(255, 255, 255, 0.8);
+  --color-tertiary: rgba(255, 255, 255, 0.56);
+  --color-quaternary: rgba(255, 255, 255, 0.24);
+  --color-muted: var(--color-quaternary);
+
+  --color-card: rgba(255, 255, 255, 0.04);
+  --color-card-border: rgba(255, 255, 255, 0.04);
+  --color-card-border-hover: rgba(255, 255, 255, 0.16);
+  --color-card-hover: rgba(255, 255, 255, 0.08);
+  --card-border-width: 1px;
+  --color-divider: rgba(255, 255, 255, 0.08);
+
+  --color-overlay-primary: #202022;
+  --color-overlay-secondary: rgba(32, 32, 34, 0.8);
+  --color-overlay-backdrop: rgba(0, 0, 0, 0.6);
+
+  --color-accent-400: oklch(0.702 0.183 293.541);
+  --color-accent-500: oklch(0.606 0.25 292.717);
+  --color-accent-700: oklch(0.491 0.27 292.581);
+  --color-success-500: oklch(0.696 0.17 162.48);
+  --color-success-700: oklch(0.508 0.118 165.612);
+  --color-danger-500: oklch(0.645 0.246 16.439);
+  --color-danger-700: oklch(0.514 0.222 16.935);
+  --color-warning-300: oklch(0.905 0.182 98.111);
+  --color-warning-600: oklch(0.681 0.162 75.834);
+  --color-warning-700: oklch(0.554 0.135 66.442);
+  --color-error: #ff637e;
+
+  --btn-secondary-content: #000;
+  --btn-secondary: #fff;
+  --btn-secondary-hover: rgba(255, 255, 255, 0.8);
+  --btn-tertiary-content: rgba(255, 255, 255, 0.56);
+  --btn-tertiary: rgba(255, 255, 255, 0.08);
+  --btn-tertiary-hover: rgba(255, 255, 255, 0.16);
+  --btn-flat-content: var(--color-tertiary);
+  --btn-flat-hover: rgba(255, 255, 255, 0.08);
+
+  --input-bg: color-mix(in oklab, var(--color-background) 64%, transparent);
+  --chip-secondary-bg: rgba(255, 255, 255, 0.08);
+
+  --radius-xs: 0.25rem;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+
+  --font-title: var(--font-class-display, system-ui);
+  --font-body: var(--font-general-sans, system-ui);
+
+  /* Legacy project aliases */
+  --white: var(--color-primary);
+  --white-alt: var(--color-secondary);
+  --black: var(--color-background);
+  --black-alt: var(--color-card);
+  --accent: var(--color-accent-500);
+  --text-primary: var(--color-primary);
+  --text-secondary: var(--color-secondary);
+  --text-tertiary: var(--color-tertiary);
+  --text-muted: var(--color-quaternary);
+  --background: var(--color-background);
+  --foreground: var(--color-primary);
+  --background-primary: var(--color-background);
+  --background-secondary: var(--color-card);
+  --border-primary: var(--color-divider);
 
   /* 
     override ory theme, see: https://github.com/ory/elements/tree/main/packages/elements-react#theming
   */
-  --input-background-default: var(--background-primary);
-  --input-background-hover: var(--background-secondary);
-  --border-radius-buttons: 1rem;
-  --border-radius-forms: 1rem;
+  --interface-background-brand-primary: var(--color-accent-500);
+  --interface-background-brand-primary-hover: var(--color-accent-700);
+  --interface-background-brand-secondary: var(--btn-tertiary);
+  --interface-background-brand-secondary-hover: var(--btn-tertiary-hover);
+  --interface-background-default-inverted: var(--color-primary);
+  --interface-background-default-inverted-hover: var(--btn-secondary-hover);
+  --interface-background-default-none: transparent;
+  --interface-background-default-primary: var(--color-card);
+  --interface-background-default-primary-hover: var(--color-card-hover);
+  --interface-background-default-secondary: var(--btn-tertiary);
+  --interface-background-default-secondary-hover: var(--btn-tertiary-hover);
+  --interface-background-default-tertiary: var(--chip-secondary-bg);
+  --interface-background-default-tertiary-hover: var(--btn-tertiary-hover);
+  --interface-background-disabled-disabled: var(--color-card);
+  --interface-background-validation-danger: var(--color-danger-500);
+  --interface-background-validation-success: var(--color-success-500);
+  --interface-background-validation-warning: var(--color-warning-600);
+  --interface-border-brand-brand: var(--color-accent-500);
+  --interface-border-default-inverted: var(--color-quaternary);
+  --interface-border-default-none: transparent;
+  --interface-border-default-primary: var(--color-divider);
+  --interface-border-disabled-disabled: transparent;
+  --interface-border-validation-danger: var(--color-danger-500);
+  --interface-border-validation-success: var(--color-success-500);
+  --interface-border-validation-warning: var(--color-warning-600);
+  --interface-foreground-brand-on-primary: var(--color-primary);
+  --interface-foreground-brand-on-secondary: var(--color-primary);
+  --interface-foreground-brand-primary: var(--color-accent-400);
+  --interface-foreground-brand-secondary: var(--color-tertiary);
+  --interface-foreground-default-inverted: var(--color-primary-invert);
+  --interface-foreground-default-primary: var(--color-primary);
+  --interface-foreground-default-secondary: var(--color-secondary);
+  --interface-foreground-default-tertiary: var(--color-tertiary);
+  --interface-foreground-disabled-disabled: var(--color-quaternary);
+  --interface-foreground-disabled-on-disabled: var(--color-quaternary);
+  --interface-foreground-validation-danger: var(--color-error);
+  --interface-foreground-validation-success: var(--color-success-500);
+  --interface-foreground-validation-warning: var(--color-warning-300);
 
-  --button-social-foreground-default: var(--text-primary);
-  --button-social-background-default: var(--background-primary);
-  --button-social-background-hover: var(--background-secondary);
+  --button-link-brand-brand: var(--color-accent-400);
+  --button-link-brand-brand-hover: var(--color-primary);
+  --button-link-default-primary: var(--color-primary);
+  --button-link-default-primary-hover: var(--color-accent-400);
+  --button-link-default-secondary: var(--color-tertiary);
+  --button-link-default-secondary-hover: var(--color-primary);
+  --button-link-disabled-disabled: var(--color-quaternary);
+  --button-primary-background-default: var(--color-accent-500);
+  --button-primary-background-disabled: var(--color-card);
+  --button-primary-background-hover: var(--color-accent-700);
+  --button-primary-border-default: transparent;
+  --button-primary-border-disabled: transparent;
+  --button-primary-border-hover: transparent;
+  --button-primary-foreground-default: var(--color-primary);
+  --button-primary-foreground-disabled: var(--color-quaternary);
+  --button-primary-foreground-hover: var(--color-primary);
+  --button-secondary-background-default: var(--btn-secondary);
+  --button-secondary-background-disabled: var(--color-card);
+  --button-secondary-background-hover: var(--btn-secondary-hover);
+  --button-secondary-border-default: transparent;
+  --button-secondary-border-disabled: transparent;
+  --button-secondary-border-hover: transparent;
+  --button-secondary-foreground-default: var(--btn-secondary-content);
+  --button-secondary-foreground-disabled: var(--color-quaternary);
+  --button-secondary-foreground-hover: var(--btn-secondary-content);
+  --button-social-background-default: var(--btn-tertiary);
+  --button-social-background-disabled: var(--color-card);
+  --button-social-background-generic-provider: var(--color-primary);
+  --button-social-background-hover: var(--btn-tertiary-hover);
+  --button-social-border-default: var(--color-card-border);
+  --button-social-border-disabled: transparent;
+  --button-social-border-generic-provider: transparent;
+  --button-social-border-hover: var(--color-card-border-hover);
+  --button-social-foreground-default: var(--color-primary);
+  --button-social-foreground-disabled: var(--color-quaternary);
+  --button-social-foreground-generic-provider: var(--color-primary-invert);
+  --button-social-foreground-hover: var(--color-primary);
 
-  --button-secondary-foreground-hover: var(--text-primary);
-  --button-secondary-background-hover: var(--background-secondary);
-
-  --interface-foreground-default-primary: var(--text-primary);
-  --interface-foreground-brand-primary: var(--accent);
-  --interface-border-default-primary: var(--border-primary);
-  --interface-background-default-primary: var(--background-primary);
-  --interface-background-default-secondary: var(--background-secondary);
-  --interface-background-default-primary-hover: var(--background-secondary);
-  --input-background-disabled: var(--background-secondary);
+  --checkbox-background-checked: var(--color-accent-500);
+  --checkbox-background-default: var(--input-bg);
+  --checkbox-border-checkbox-border-checked: var(--color-accent-500);
+  --checkbox-border-checkbox-border-default: var(--color-divider);
+  --checkbox-foreground-checked: var(--color-primary);
+  --checkbox-foreground-default: var(--color-primary);
+  --form-background-default: var(--color-card);
+  --form-border-default: var(--color-card-border);
+  --input-background-default: var(--input-bg);
+  --input-background-disabled: var(--color-card);
+  --input-background-hover: var(--color-card-hover);
+  --input-border-default: var(--color-divider);
   --input-border-disabled: transparent;
+  --input-border-focus: var(--color-primary);
+  --input-border-hover: var(--color-quaternary);
+  --input-foreground-disabled: var(--color-quaternary);
+  --input-foreground-primary: var(--color-primary);
+  --input-foreground-secondary: var(--color-secondary);
+  --input-foreground-tertiary: var(--color-tertiary);
+  --ory-background-default: var(--color-background);
+  --ory-border-default: var(--color-divider);
+  --ory-foreground-default: var(--color-primary);
+  --radio-background-checked: var(--color-accent-500);
+  --radio-background-default: var(--input-bg);
+  --radio-border-checked: var(--color-accent-500);
+  --radio-border-default: var(--color-divider);
+  --radio-foreground-checked: var(--color-primary);
+  --radio-foreground-default: var(--color-primary);
+  --toggle-background-checked: var(--color-accent-500);
+  --toggle-background-default: var(--input-bg);
+  --toggle-border-checked: transparent;
+  --toggle-border-default: var(--color-divider);
+  --toggle-foreground-checked: var(--color-primary);
+  --toggle-foreground-default: var(--color-accent-400);
+
+  --border-radius-buttons: var(--radius-lg);
+  --border-radius-forms: var(--radius-lg);
+  --border-radius-general: var(--radius-sm);
+  --border-radius-branding: var(--radius-md);
+  --border-radius-cards: var(--radius-xl);
+  --border-radius-identifier: 62.4375rem;
+
+  color: var(--color-primary);
 }
 
-/* Dark mode theme */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text-primary: var(--white);
-    --background-primary: var(--black);
-    --background-secondary: var(--black-alt);
-    --border-primary: var(--black-alt);
-  }
+main {
+  background: var(--color-background);
+  color: var(--color-primary);
+  font-family: var(--font-body);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.font-title {
+  font-family: var(--font-title);
+}
+
+.font-body {
+  font-family: var(--font-body);
+}
+
+.border,
+.border-1,
+.border-2,
+.border-r,
+.border-l,
+.border-t,
+.border-b,
+.border-x,
+.border-y {
+  border-color: var(--color-divider);
+}
+
+.btn {
+  --btn-bg: transparent;
+  --btn-bg-hover: transparent;
+  --btn-content: inherit;
+  --btn-content-hover: inherit;
+  --btn-border-color: transparent;
+
+  background-color: var(--btn-bg);
+  color: var(--btn-content);
+  border: 1px solid var(--btn-border-color);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn:hover {
+  background-color: var(--btn-bg-hover);
+  color: var(--btn-content-hover);
+}
+
+.btn:disabled,
+.btn:hover:disabled {
+  background-color: var(--btn-bg);
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  --btn-bg: var(--color-accent-500);
+  --btn-bg-hover: var(--color-accent-700);
+}
+
+.btn-secondary {
+  --btn-bg: var(--btn-secondary);
+  --btn-bg-hover: var(--btn-secondary-hover);
+  --btn-content: var(--btn-secondary-content);
+  --btn-content-hover: var(--btn-secondary-content);
+}
+
+.btn-tertiary {
+  --btn-bg: var(--btn-tertiary);
+  --btn-bg-hover: var(--btn-tertiary-hover);
+  --btn-content: var(--btn-tertiary-content);
+}
+
+.btn-flat {
+  --btn-content: var(--btn-flat-content);
+  --btn-bg-hover: var(--btn-flat-hover);
+}
+
+.btn-danger {
+  --btn-bg: var(--color-danger-500);
+  --btn-bg-hover: var(--color-danger-700);
+}
+
+.btn-outlined {
+  --btn-bg: transparent;
+  --btn-border-color: currentColor;
+}
+
+.input-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.input-field .control {
+  --input-size: 8px 14px;
+  --input-padding: var(--input-size);
+
+  display: flex;
+  gap: 10px;
+  height: 40px;
+  padding: var(--input-padding);
+  background-color: var(--input-bg);
+  border: 1px solid var(--color-divider);
+  border-radius: 8px;
+}
+
+.input-field .control:hover {
+  border-color: var(--color-quaternary);
+}
+
+.input-field .control:focus-within {
+  border-color: var(--color-primary);
+}
+
+.input-field input,
+.input-field textarea {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  outline: none;
+  font-weight: 500;
+  color: inherit;
+  background: transparent;
+}
+
+.input-field textarea {
+  height: auto;
+  resize: none;
+}
+
+.link {
+  --link-color: inherit;
+  --link-size: 1rem;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--link-color);
+  font-weight: 500;
+}
+
+.link.secondary {
+  --link-color: var(--color-tertiary);
+}
+
+.link.secondary:hover,
+.link.secondary.active {
+  --link-color: inherit;
+}
+
+button[name="provider"][value^="apple"] svg path {
+  fill: #fff;
 }
 
 .page {
@@ -56,7 +375,8 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: #101010;
+  background-color: var(--color-background);
+  color: var(--color-primary);
   gap: 21px;
   padding: 21px 0;
 }
@@ -88,7 +408,7 @@
   }
 
   input:hover {
-    background-color: var(--black);
+    background-color: var(--input-bg);
   }
 }
 
@@ -102,8 +422,9 @@
   width: 100%;
   justify-content: center;
   align-items: center;
-  background-color: #000000;
-  border-radius: 21px;
+  background-color: var(--color-card);
+  border: var(--card-border-width) solid var(--color-card-border);
+  border-radius: var(--radius-xl);
 }
 
 .bg-button-social-background-generic-provider {

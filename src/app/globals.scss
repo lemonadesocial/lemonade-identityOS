@@ -15,9 +15,11 @@ body {
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Inter, Helvetica, sans-serif;
+  color: var(--color-primary);
+  background: var(--color-background);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 @layer utilities {
