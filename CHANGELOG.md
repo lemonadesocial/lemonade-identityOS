@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.10.0](https://github.com/lemonadesocial/lemonade-identityOS/compare/v1.9.0...v1.10.0) (2026-05-05)
+
+
+### Features
+
+* apply Lemonade dark theme tokens ([61a195a](https://github.com/lemonadesocial/lemonade-identityOS/commit/61a195ad62b5318f48bd2cd82a4026aed7811099))
+
 ## [1.9.0](https://github.com/lemonadesocial/lemonade-identityOS/compare/v1.8.2...v1.9.0) (2026-01-04)
 
 
