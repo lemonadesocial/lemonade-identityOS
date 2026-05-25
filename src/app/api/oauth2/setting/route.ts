@@ -46,10 +46,10 @@ async function processPost(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const response = await processPost(request);
-  return addCorsHeaders(response);
+  return addCorsHeaders(request, response);
 }
 
-export async function OPTIONS() {
+export async function OPTIONS(request: NextRequest) {
   const response = new NextResponse(null, { status: 200 });
-  return addCorsHeaders(response);
+  return addCorsHeaders(request, response);
 }
